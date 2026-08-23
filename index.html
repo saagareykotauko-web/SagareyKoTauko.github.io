@@ -1,0 +1,2746 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>BILLA - VIP Gaming Platform</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            billa: {
+              dark: '#05070c',
+              darker: '#020306',
+              surface: '#0d111c',
+              surface2: '#131929',
+              card: '#161d31',
+              gold: '#fbbf24',
+              goldLight: '#fde68a',
+              goldDark: '#b45309',
+              emerald: '#10b981',
+              purple: '#a855f7',
+              neon: '#06b6d4',
+              crimson: '#f43f5e',
+              ludoRed: '#ef4444',
+              ludoGreen: '#10b981',
+              ludoYellow: '#eab308',
+              ludoBlue: '#3b82f6'
+            }
+          },
+          boxShadow: {
+            'gold-glow': '0 0 25px -4px rgba(251, 191, 36, 0.45)',
+            'purple-glow': '0 0 25px -4px rgba(168, 85, 247, 0.45)',
+            'neon-glow': '0 0 25px -4px rgba(6, 182, 212, 0.45)',
+            'emerald-glow': '0 0 25px -4px rgba(16, 185, 129, 0.45)',
+            'crimson-glow': '0 0 25px -4px rgba(244, 63, 94, 0.45)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Rajdhani:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --font-display: 'Cinzel', serif;
+      --font-tech: 'Rajdhani', sans-serif;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: #05070c;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 0% 100%, rgba(168, 85, 247, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.08) 0%, transparent 40%);
+      color: #f3f4f6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.4s ease;
+    }
+
+    .font-display { font-family: var(--font-display); }
+    .font-tech { font-family: var(--font-tech); }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #070a12; }
+    ::-webkit-scrollbar-thumb { background: #232b42; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #fbbf24; }
+
+    /* Golden & Neon Accents */
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #fffbeb 0%, #fbbf24 50%, #b45309 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .neon-cyan-text {
+      background: linear-gradient(135deg, #e0f2fe 0%, #06b6d4 60%, #0284c7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .vip-glass {
+      background: rgba(13, 17, 28, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(251, 191, 36, 0.18);
+    }
+    .vip-glass-card {
+      background: rgba(22, 29, 49, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .vip-glass-card:hover {
+      border-color: rgba(251, 191, 36, 0.4);
+      transform: translateY(-2px);
+    }
+
+    /* 3D Kinetic Realistic Dice Physics & Animation */
+    .dice-cube {
+      width: 64px;
+      height: 64px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease-out;
+      cursor: pointer;
+    }
+    .dice-face {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #f4f5f8 60%, #cbd5e1 100%);
+      border: 2px solid #94a3b8;
+      border-radius: 12px;
+      display: grid;
+      grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+      padding: 6px;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .pip {
+      width: 10px;
+      height: 10px;
+      background: #111827;
+      border-radius: 50%;
+      margin: auto;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.6);
+    }
+    .pip.red-pip {
+      background: #dc2626;
+      width: 13px;
+      height: 13px;
+    }
+
+    /* 3D Dice Face Orientations */
+    .dice-face-1 { transform: rotateY(0deg) translateZ(32px); }
+    .dice-face-6 { transform: rotateY(180deg) translateZ(32px); }
+    .dice-face-2 { transform: rotateY(90deg) translateZ(32px); }
+    .dice-face-5 { transform: rotateY(-90deg) translateZ(32px); }
+    .dice-face-3 { transform: rotateX(90deg) translateZ(32px); }
+    .dice-face-4 { transform: rotateX(-90deg) translateZ(32px); }
+
+    /* Rolling & Bouncing Animation */
+    @keyframes dicePhysicsTumble {
+      0% { transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(0.9); }
+      20% { transform: translate3d(-28px, -45px, 60px) rotateX(240deg) rotateY(180deg) rotateZ(90deg) scale(1.15); }
+      40% { transform: translate3d(32px, -30px, 40px) rotateX(480deg) rotateY(360deg) rotateZ(210deg) scale(1.05); }
+      60% { transform: translate3d(-18px, -15px, 20px) rotateX(680deg) rotateY(520deg) rotateZ(300deg) scale(0.98); }
+      80% { transform: translate3d(10px, -5px, 10px) rotateX(720deg) rotateY(640deg) rotateZ(350deg) scale(1.02); }
+      100% { transform: translate3d(0, 0, 0) scale(1); }
+    }
+    .rolling-active {
+      animation: dicePhysicsTumble 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    /* Pulse Glow */
+    @keyframes turnPulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); transform: scale(1); }
+      50% { box-shadow: 0 0 25px rgba(251, 191, 36, 0.9); transform: scale(1.04); }
+    }
+    .active-player-glow {
+      animation: turnPulse 1.8s infinite ease-in-out;
+    }
+
+    /* Ludo Custom Tokens & Board */
+    .ludo-token {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.5), inset 0 -3px 3px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 20;
+    }
+    .ludo-token::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.8);
+    }
+    .ludo-token.can-move {
+      animation: bounceToken 0.7s infinite alternate ease-in-out;
+      border-color: #fbbf24;
+      box-shadow: 0 0 12px #fbbf24, inset 0 0 4px #fff;
+      z-index: 25;
+    }
+    @keyframes bounceToken {
+      from { transform: translateY(0) scale(1); }
+      to { transform: translateY(-7px) scale(1.22); }
+    }
+
+    /* Uno Cards */
+    .uno-card {
+      width: 58px;
+      height: 84px;
+      border-radius: 8px;
+      position: relative;
+      border: 2px solid white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-tech);
+    }
+    .uno-card:hover {
+      transform: translateY(-8px) scale(1.08);
+      z-index: 30;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+    }
+    .uno-red { background: linear-gradient(135deg, #ef4444, #991b1b); color: #fff; }
+    .uno-blue { background: linear-gradient(135deg, #3b82f6, #1e40af); color: #fff; }
+    .uno-green { background: linear-gradient(135deg, #10b981, #065f46); color: #fff; }
+    .uno-yellow { background: linear-gradient(135deg, #eab308, #854d0e); color: #000; }
+    .uno-wild { background: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6, #10b981); color: #fff; }
+
+    /* Domino Tile */
+    .domino-tile {
+      width: 44px;
+      height: 86px;
+      background: #fdfdfd;
+      border-radius: 6px;
+      border: 2px solid #334155;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .domino-tile:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 16px rgba(251, 191, 36, 0.4);
+    }
+    .domino-half {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-size: 14px;
+      font-weight: bold;
+      color: #0f172a;
+    }
+    .domino-divider {
+      height: 2px;
+      background: #94a3b8;
+      width: 80%;
+      margin: 0 auto;
+    }
+
+    /* Modal Overlay Animation */
+    .modal-backdrop {
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+
+<body class="flex flex-col min-h-screen text-slate-100">
+
+  <!-- ================= TOP VIP HEADER NAVIGATION ================= -->
+  <header class="sticky top-0 z-50 vip-glass border-b border-amber-500/20 px-3 sm:px-6 py-2.5 transition-all">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('home')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-200 p-[2px] shadow-gold-glow flex items-center justify-center">
+          <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+            <i class="fa-solid fa-crown text-amber-400 text-lg"></i>
+          </div>
+        </div>
+        <div>
+          <span class="font-display font-black text-2xl tracking-wider gold-gradient-text drop-shadow">BILLA</span>
+          <span class="text-[9px] block tracking-widest text-amber-400 font-tech font-bold uppercase -mt-1">VIP Gaming Hub</span>
+        </div>
+      </div>
+
+      <!-- Main Navigation Tabs -->
+      <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 font-tech text-base tracking-wide font-semibold">
+        <button onclick="switchTab('home')" class="nav-btn px-3 py-1.5 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-amber-400/10 transition active-tab text-amber-400 bg-amber-400/10" data-tab="home">
+          <i class="fa-solid fa-house mr-1.5"></i>Home
+        </button>
+        <button onclick="switchTab('play')" class="nav-btn px-3 py-1.5 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-amber-400/10 transition" data-tab="play">
+          <i class="fa-solid fa-gamepad mr-1.5"></i>Play Arena
+        </button>
+        <button onclick="switchTab('all-games')" class="nav-btn px-3 py-1.5 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-amber-400/10 transition" data-tab="all-games">
+          <i class="fa-solid fa-layer-group mr-1.5"></i>All Games
+        </button>
+        <button onclick="switchTab('leaderboard')" class="nav-btn px-3 py-1.5 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-amber-400/10 transition" data-tab="leaderboard">
+          <i class="fa-solid fa-trophy mr-1.5"></i>Leaderboard
+        </button>
+        <button onclick="switchTab('rewards')" class="nav-btn px-3 py-1.5 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-amber-400/10 transition" data-tab="rewards">
+          <i class="fa-solid fa-gem mr-1.5"></i>Rewards
+        </button>
+        <button onclick="switchTab('profile')" class="nav-btn px-3 py-1.5 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-amber-400/10 transition" data-tab="profile">
+          <i class="fa-solid fa-user-ninja mr-1.5"></i>Profile
+        </button>
+        <button onclick="switchTab('help')" class="nav-btn px-3 py-1.5 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-amber-400/10 transition" data-tab="help">
+          <i class="fa-solid fa-circle-question mr-1.5"></i>Help
+        </button>
+        <button onclick="switchTab('settings')" class="nav-btn px-3 py-1.5 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-amber-400/10 transition" data-tab="settings">
+          <i class="fa-solid fa-sliders mr-1.5"></i>Settings
+        </button>
+      </nav>
+
+      <!-- Audio Toggle & Admin Button -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Ambient Music Toggle -->
+        <button id="bgmToggleBtn" onclick="toggleBgm()" class="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-xs sm:text-sm font-tech text-amber-300 border border-amber-500/30 flex items-center gap-1.5" title="Toggle VIP Ambient Lounge Music">
+          <i class="fa-solid fa-volume-high text-amber-400" id="bgmIcon"></i>
+          <span class="hidden sm:inline font-bold" id="bgmStatusText">Music ON</span>
+        </button>
+
+        <!-- Admin Access Button -->
+        <button onclick="openAdminModal()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-700 hover:from-amber-400 hover:to-amber-600 text-slate-950 font-tech font-bold text-xs sm:text-sm shadow-gold-glow flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Admin</span>
+        </button>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button onclick="toggleMobileNav()" class="md:hidden p-2 rounded-lg bg-slate-800 text-slate-200 hover:text-amber-400">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobileNavMenu" class="hidden md:hidden pt-3 pb-2 px-2 border-t border-slate-800 mt-2 space-y-1">
+      <div class="grid grid-cols-3 gap-2 font-tech text-sm font-semibold text-center">
+        <button onclick="switchTab('home'); toggleMobileNav();" class="p-2 rounded bg-slate-800 hover:text-amber-400"><i class="fa-solid fa-house block text-base mb-1"></i>Home</button>
+        <button onclick="switchTab('play'); toggleMobileNav();" class="p-2 rounded bg-slate-800 hover:text-amber-400"><i class="fa-solid fa-gamepad block text-base mb-1"></i>Play</button>
+        <button onclick="switchTab('all-games'); toggleMobileNav();" class="p-2 rounded bg-slate-800 hover:text-amber-400"><i class="fa-solid fa-layer-group block text-base mb-1"></i>Games</button>
+        <button onclick="switchTab('leaderboard'); toggleMobileNav();" class="p-2 rounded bg-slate-800 hover:text-amber-400"><i class="fa-solid fa-trophy block text-base mb-1"></i>Rank</button>
+        <button onclick="switchTab('rewards'); toggleMobileNav();" class="p-2 rounded bg-slate-800 hover:text-amber-400"><i class="fa-solid fa-gem block text-base mb-1"></i>Rewards</button>
+        <button onclick="switchTab('profile'); toggleMobileNav();" class="p-2 rounded bg-slate-800 hover:text-amber-400"><i class="fa-solid fa-user-ninja block text-base mb-1"></i>Profile</button>
+        <button onclick="switchTab('help'); toggleMobileNav();" class="p-2 rounded bg-slate-800 hover:text-amber-400"><i class="fa-solid fa-circle-question block text-base mb-1"></i>Help</button>
+        <button onclick="switchTab('settings'); toggleMobileNav();" class="p-2 rounded bg-slate-800 hover:text-amber-400"><i class="fa-solid fa-sliders block text-base mb-1"></i>Settings</button>
+        <button onclick="openAdminModal(); toggleMobileNav();" class="p-2 rounded bg-amber-500/20 text-amber-400"><i class="fa-solid fa-shield-halved block text-base mb-1"></i>Admin</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT VIEWPORT ================= -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-3 sm:p-6 pb-20">
+
+    <!-- ----------------- SECTION 1: HOME TAB ----------------- -->
+    <div id="tab-home" class="tab-content space-y-8">
+      
+      <!-- MANDATORY SIGNATURE HERO BANNER -->
+      <div class="relative overflow-hidden rounded-2xl border border-amber-500/30 p-6 sm:p-10 vip-glass shadow-gold-glow">
+        <div class="absolute -right-16 -top-16 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-16 -bottom-16 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 text-center max-w-4xl mx-auto space-y-4">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-tech tracking-widest uppercase animate-pulse">
+            <i class="fa-solid fa-sparkles"></i> The Premier High-Stakes Experience
+          </div>
+
+          <!-- EXACT MANDATORY TEXT -->
+          <h1 class="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-wider leading-tight">
+            <span class="gold-gradient-text">WEL COME TO THE IMAGINATION OF SAAGAR</span>
+          </h1>
+
+          <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto font-sans leading-relaxed">
+            Step into BILLA's royal gaming colosseum. Challenge intelligent AI bots across classic strategic titles or engage in head-to-head offline clashes with unmatched cinematic graphics and audio.
+          </p>
+
+          <div class="pt-4 flex flex-wrap justify-center gap-3 sm:gap-4 font-tech">
+            <button onclick="switchTab('play')" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 text-slate-950 font-bold text-lg hover:shadow-gold-glow transform hover:-translate-y-0.5 transition flex items-center gap-2">
+              <i class="fa-solid fa-play"></i> ENTER ARENA NOW
+            </button>
+            <button onclick="switchTab('all-games')" class="px-6 py-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-amber-400/50 font-bold text-lg transition flex items-center gap-2">
+              <i class="fa-solid fa-dice"></i> BROWSE 10+ GAMES
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Quick Stats Bar -->
+        <div class="mt-8 pt-6 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center font-tech">
+          <div>
+            <div class="text-xs uppercase text-slate-400">Total Elite Visits</div>
+            <div id="statTotalVisitsHome" class="text-2xl font-black text-amber-400">148,920</div>
+          </div>
+          <div>
+            <div class="text-xs uppercase text-slate-400">Live Contenders</div>
+            <div id="statOnlineHome" class="text-2xl font-black text-emerald-400">1,482</div>
+          </div>
+          <div>
+            <div class="text-xs uppercase text-slate-400">Total Battles Won</div>
+            <div id="statGamesPlayedHome" class="text-2xl font-black text-cyan-400">624,190</div>
+          </div>
+          <div>
+            <div class="text-xs uppercase text-slate-400">Bot Difficulty</div>
+            <div class="text-2xl font-black text-purple-400">GRANDMASTER AI</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured Games Spotlight -->
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl sm:text-2xl font-tech font-bold text-amber-400 flex items-center gap-2">
+            <i class="fa-solid fa-fire text-amber-500"></i> POPULAR TOURNAMENTS
+          </h2>
+          <button onclick="switchTab('all-games')" class="text-sm font-tech text-slate-400 hover:text-amber-400">View All (11) <i class="fa-solid fa-arrow-right ml-1"></i></button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          
+          <!-- Card: Ludo -->
+          <div class="vip-glass-card rounded-xl p-5 relative overflow-hidden group transition cursor-pointer" onclick="launchGame('ludo')">
+            <div class="absolute top-3 right-3 px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase font-tech">Featured 1-3 Bots</div>
+            <div class="flex items-center gap-4 mb-3">
+              <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-red-500 via-amber-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-lg">
+                <i class="fa-solid fa-dice-six"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-white group-hover:text-amber-400 transition font-display">Royal Ludo Pro</h3>
+                <p class="text-xs text-slate-400">1 to 3 Bots • 4-Player Hotseat • Authentic Cross</p>
+              </div>
+            </div>
+            <p class="text-xs text-slate-300 line-clamp-2 mb-4">Complete 4-yard Ludo arena with realistic rolling kinetic dice, token collisions, and smart bot AI.</p>
+            <button class="w-full py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 font-tech font-bold text-sm border border-amber-500/40 transition">LAUNCH GAME</button>
+          </div>
+
+          <!-- Card: Snakes & Ladders -->
+          <div class="vip-glass-card rounded-xl p-5 relative overflow-hidden group transition cursor-pointer" onclick="launchGame('snakes')">
+            <div class="absolute top-3 right-3 px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 uppercase font-tech">1-100 Classic</div>
+            <div class="flex items-center gap-4 mb-3">
+              <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-400 flex items-center justify-center text-white text-2xl shadow-lg">
+                <i class="fa-solid fa-stairs"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-white group-hover:text-emerald-400 transition font-display">Snakes & Ladders</h3>
+                <p class="text-xs text-slate-400">Full 1-100 Grid • Vector Paths • Bot AI</p>
+              </div>
+            </div>
+            <p class="text-xs text-slate-300 line-clamp-2 mb-4">Authentic 100-cell classic board with real graphical snake bites and golden ladder climbs.</p>
+            <button class="w-full py-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 font-tech font-bold text-sm border border-emerald-500/40 transition">LAUNCH GAME</button>
+          </div>
+
+          <!-- Card: Connect Four -->
+          <div class="vip-glass-card rounded-xl p-5 relative overflow-hidden group transition cursor-pointer" onclick="launchGame('connect4')">
+            <div class="absolute top-3 right-3 px-2 py-0.5 rounded text-[11px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 uppercase font-tech">Tactical 7x6</div>
+            <div class="flex items-center gap-4 mb-3">
+              <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-500 flex items-center justify-center text-white text-2xl shadow-lg">
+                <i class="fa-solid fa-circle-nodes"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-white group-hover:text-cyan-400 transition font-display">Connect Four</h3>
+                <p class="text-xs text-slate-400">Smart Block & Trap AI • PvP Mode</p>
+              </div>
+            </div>
+            <p class="text-xs text-slate-300 line-clamp-2 mb-4">Drop glowing neon chips to form four in a row horizontally, vertically, or diagonally.</p>
+            <button class="w-full py-2 rounded-lg bg-cyan-500/20 hover:bg-cyan-500 text-cyan-300 hover:text-slate-950 font-tech font-bold text-sm border border-cyan-500/40 transition">LAUNCH GAME</button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ----------------- SECTION 2: PLAY ARENA TAB ----------------- -->
+    <div id="tab-play" class="tab-content hidden space-y-6">
+      
+      <!-- Top Control Bar in Arena -->
+      <div class="vip-glass rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 border border-amber-500/20">
+        <div class="flex items-center gap-3">
+          <div class="text-amber-400 text-xl"><i class="fa-solid fa-gamepad"></i></div>
+          <div>
+            <h2 id="activeGameTitle" class="font-display font-bold text-lg text-white">Select a Battle Arena</h2>
+            <p id="activeGameSub" class="text-xs text-slate-400">Choose game mode below to start match</p>
+          </div>
+        </div>
+
+        <!-- Mode Selectors -->
+        <div class="flex flex-wrap items-center gap-2 font-tech">
+          <div class="bg-slate-900 p-1 rounded-lg border border-slate-700 flex items-center">
+            <button id="modeBotBtn" onclick="setGameMode('bot')" class="px-3 py-1 text-xs sm:text-sm font-bold rounded bg-amber-500 text-slate-950 transition">
+              <i class="fa-solid fa-robot mr-1"></i> Player vs Bot
+            </button>
+            <button id="modePvpBtn" onclick="setGameMode('pvp')" class="px-3 py-1 text-xs sm:text-sm font-bold rounded text-slate-300 hover:text-white transition">
+              <i class="fa-solid fa-user-group mr-1"></i> Hotseat PvP
+            </button>
+          </div>
+
+          <!-- Ludo-Specific Bot Count Selector -->
+          <div id="ludoBotCountSelector" class="hidden items-center gap-1 bg-slate-900 px-2 py-1 rounded-lg border border-amber-500/30">
+            <span class="text-xs text-amber-400 font-bold uppercase mr-1">Bots:</span>
+            <button onclick="setLudoBotCount(1)" id="ludoBot1Btn" class="px-2 py-0.5 text-xs font-bold rounded bg-slate-800 text-slate-300 hover:bg-amber-400 hover:text-slate-950">1</button>
+            <button onclick="setLudoBotCount(2)" id="ludoBot2Btn" class="px-2 py-0.5 text-xs font-bold rounded bg-slate-800 text-slate-300 hover:bg-amber-400 hover:text-slate-950">2</button>
+            <button onclick="setLudoBotCount(3)" id="ludoBot3Btn" class="px-2 py-0.5 text-xs font-bold rounded bg-amber-500 text-slate-950 font-black">3</button>
+          </div>
+
+          <button onclick="restartCurrentGame()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs sm:text-sm text-slate-200 border border-slate-700 flex items-center gap-1.5" title="Reset current match">
+            <i class="fa-solid fa-rotate-right text-amber-400"></i> Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Game Stage Container -->
+      <div id="gameArenaStage" class="vip-glass rounded-2xl p-3 sm:p-6 min-h-[580px] flex flex-col items-center justify-center border border-slate-800 relative shadow-2xl">
+        <!-- Dynamic Game Injection Target -->
+        <div id="gameViewport" class="w-full flex flex-col items-center justify-center">
+          <!-- Default Welcome to Play Arena -->
+          <div class="text-center py-12 space-y-4 max-w-md">
+            <div class="w-20 h-20 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-3xl">
+              <i class="fa-solid fa-play"></i>
+            </div>
+            <h3 class="font-display text-2xl font-bold text-white">Choose Your Game</h3>
+            <p class="text-xs text-slate-400">Select any fully functional game from below to load the interactive canvas engine instantly.</p>
+            <div class="flex flex-wrap justify-center gap-2 pt-2">
+              <button onclick="launchGame('ludo')" class="px-4 py-2 bg-red-600/20 border border-red-500/50 hover:bg-red-600 rounded-lg text-xs font-bold text-red-300 hover:text-white font-tech transition">Play Ludo (1-3 Bots)</button>
+              <button onclick="launchGame('snakes')" class="px-4 py-2 bg-emerald-600/20 border border-emerald-500/50 hover:bg-emerald-600 rounded-lg text-xs font-bold text-emerald-300 hover:text-white font-tech transition">Snakes & Ladders</button>
+              <button onclick="launchGame('tictactoe')" class="px-4 py-2 bg-purple-600/20 border border-purple-500/50 hover:bg-purple-600 rounded-lg text-xs font-bold text-purple-300 hover:text-white font-tech transition">Tic Tac Toe (Minimax)</button>
+              <button onclick="launchGame('connect4')" class="px-4 py-2 bg-cyan-600/20 border border-cyan-500/50 hover:bg-cyan-600 rounded-lg text-xs font-bold text-cyan-300 hover:text-white font-tech transition">Connect Four</button>
+              <button onclick="launchGame('checkers')" class="px-4 py-2 bg-amber-600/20 border border-amber-500/50 hover:bg-amber-600 rounded-lg text-xs font-bold text-amber-300 hover:text-white font-tech transition">Checkers</button>
+              <button onclick="launchGame('uno')" class="px-4 py-2 bg-pink-600/20 border border-pink-500/50 hover:bg-pink-600 rounded-lg text-xs font-bold text-pink-300 hover:text-white font-tech transition">Uno Cards</button>
+              <button onclick="launchGame('dominoes')" class="px-4 py-2 bg-teal-600/20 border border-teal-500/50 hover:bg-teal-600 rounded-lg text-xs font-bold text-teal-300 hover:text-white font-tech transition">Dominoes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ----------------- SECTION 3: ALL GAMES DIRECTORY ----------------- -->
+    <div id="tab-all-games" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="font-display text-2xl font-bold gold-gradient-text">Master Games Catalog</h2>
+          <p class="text-xs text-slate-400">Playable Engines & Grandmaster Tournament Previews</p>
+        </div>
+        <span class="px-3 py-1 rounded bg-amber-500/20 text-amber-400 font-tech font-bold text-xs border border-amber-500/30">11 TITLES ACTIVE</span>
+      </div>
+
+      <!-- Playable Engines Grid -->
+      <h3 class="text-xs uppercase tracking-widest text-emerald-400 font-tech font-bold"><i class="fa-solid fa-circle-check mr-1"></i> Fully Playable Pure JavaScript Engines</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        
+        <!-- Game 1: Ludo -->
+        <div class="vip-glass-card p-4 rounded-xl flex flex-col justify-between border border-slate-800 group hover:border-amber-400">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-red-400 font-tech uppercase">4-Color Cross</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-tech">PLAYABLE</span>
+            </div>
+            <h4 class="font-display font-bold text-base text-white group-hover:text-amber-400">Royal Ludo</h4>
+            <p class="text-xs text-slate-400 mt-1">Multi-bot AI selector (1, 2, or 3 bots), full safety sockets, home lanes, and 3D kinetic rolling dice physics.</p>
+          </div>
+          <button onclick="launchGame('ludo')" class="mt-4 w-full py-1.5 rounded bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 font-tech font-bold text-xs transition">PLAY NOW</button>
+        </div>
+
+        <!-- Game 2: Snakes & Ladders -->
+        <div class="vip-glass-card p-4 rounded-xl flex flex-col justify-between border border-slate-800 group hover:border-emerald-400">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-emerald-400 font-tech uppercase">1-100 Canvas Grid</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-tech">PLAYABLE</span>
+            </div>
+            <h4 class="font-display font-bold text-base text-white group-hover:text-emerald-400">Snakes & Ladders</h4>
+            <p class="text-xs text-slate-400 mt-1">Real vector graphics snakes and ladders with auto-climb and slide animations.</p>
+          </div>
+          <button onclick="launchGame('snakes')" class="mt-4 w-full py-1.5 rounded bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 font-tech font-bold text-xs transition">PLAY NOW</button>
+        </div>
+
+        <!-- Game 3: Tic Tac Toe Minimax -->
+        <div class="vip-glass-card p-4 rounded-xl flex flex-col justify-between border border-slate-800 group hover:border-purple-400">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-purple-400 font-tech uppercase">Minimax AI</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-tech">PLAYABLE</span>
+            </div>
+            <h4 class="font-display font-bold text-base text-white group-hover:text-purple-400">Tic Tac Toe Glow</h4>
+            <p class="text-xs text-slate-400 mt-1">Features an unbeatable Minimax algorithm bot mode alongside a neon hotseat PvP mode.</p>
+          </div>
+          <button onclick="launchGame('tictactoe')" class="mt-4 w-full py-1.5 rounded bg-purple-500/20 hover:bg-purple-500 text-purple-300 hover:text-slate-950 font-tech font-bold text-xs transition">PLAY NOW</button>
+        </div>
+
+        <!-- Game 4: Connect Four -->
+        <div class="vip-glass-card p-4 rounded-xl flex flex-col justify-between border border-slate-800 group hover:border-cyan-400">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-cyan-400 font-tech uppercase">Block & Trap AI</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-tech">PLAYABLE</span>
+            </div>
+            <h4 class="font-display font-bold text-base text-white group-hover:text-cyan-400">Connect Four Neon</h4>
+            <p class="text-xs text-slate-400 mt-1">Complete 7x6 tactical gravity grid with predictive offensive and defensive bot logic.</p>
+          </div>
+          <button onclick="launchGame('connect4')" class="mt-4 w-full py-1.5 rounded bg-cyan-500/20 hover:bg-cyan-500 text-cyan-300 hover:text-slate-950 font-tech font-bold text-xs transition">PLAY NOW</button>
+        </div>
+
+        <!-- Game 5: Checkers -->
+        <div class="vip-glass-card p-4 rounded-xl flex flex-col justify-between border border-slate-800 group hover:border-amber-400">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-amber-400 font-tech uppercase">Crown & Jumps</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-tech">PLAYABLE</span>
+            </div>
+            <h4 class="font-display font-bold text-base text-white group-hover:text-amber-400">Checkers VIP</h4>
+            <p class="text-xs text-slate-400 mt-1">Full 8x8 checkers engine featuring diagonal capture moves, king coronation, and bot logic.</p>
+          </div>
+          <button onclick="launchGame('checkers')" class="mt-4 w-full py-1.5 rounded bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 font-tech font-bold text-xs transition">PLAY NOW</button>
+        </div>
+
+        <!-- Game 6: Uno Cards -->
+        <div class="vip-glass-card p-4 rounded-xl flex flex-col justify-between border border-slate-800 group hover:border-pink-400">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-pink-400 font-tech uppercase">Color & Wild Match</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-tech">PLAYABLE</span>
+            </div>
+            <h4 class="font-display font-bold text-base text-white group-hover:text-pink-400">Uno-Style Cards</h4>
+            <p class="text-xs text-slate-400 mt-1">Draw, match by color/number, wild cards, and dynamic bot AI turn calculations.</p>
+          </div>
+          <button onclick="launchGame('uno')" class="mt-4 w-full py-1.5 rounded bg-pink-500/20 hover:bg-pink-500 text-pink-300 hover:text-slate-950 font-tech font-bold text-xs transition">PLAY NOW</button>
+        </div>
+
+        <!-- Game 7: Dominoes -->
+        <div class="vip-glass-card p-4 rounded-xl flex flex-col justify-between border border-slate-800 group hover:border-teal-400">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-teal-400 font-tech uppercase">Pip Matching Chain</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-tech">PLAYABLE</span>
+            </div>
+            <h4 class="font-display font-bold text-base text-white group-hover:text-teal-400">Classic Dominoes</h4>
+            <p class="text-xs text-slate-400 mt-1">Bone-yard drawing, double matching, open-end connection logic, and score tallying.</p>
+          </div>
+          <button onclick="launchGame('dominoes')" class="mt-4 w-full py-1.5 rounded bg-teal-500/20 hover:bg-teal-500 text-teal-300 hover:text-slate-950 font-tech font-bold text-xs transition">PLAY NOW</button>
+        </div>
+
+      </div>
+
+      <!-- Grandmaster Tournament Previews -->
+      <h3 class="text-xs uppercase tracking-widest text-amber-400 font-tech font-bold pt-4"><i class="fa-solid fa-hourglass-half mr-1"></i> Tournament Coming Soon Modules</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        
+        <!-- Chess Preview -->
+        <div class="vip-glass-card p-4 rounded-xl border border-slate-800 relative overflow-hidden" onclick="showComingSoonModal('Chess Grandmaster', 'Official FIDE Rules, Stockfish Engine Integration, Elo Rating ladders.')">
+          <div class="text-amber-400 text-2xl mb-2"><i class="fa-solid fa-chess"></i></div>
+          <h4 class="font-display font-bold text-sm text-white">Chess Masters</h4>
+          <span class="text-[10px] text-amber-400 font-tech block mt-1">Tournament Coming Soon</span>
+          <p class="text-[11px] text-slate-400 mt-2">View manual rules & animated bot challenge preview.</p>
+        </div>
+
+        <!-- Teen Patti Preview -->
+        <div class="vip-glass-card p-4 rounded-xl border border-slate-800 relative overflow-hidden" onclick="showComingSoonModal('Teen Patti Royal', '3-Card Flash, Blind/Chaal bets, Trail/Pure Sequence payouts.')">
+          <div class="text-red-400 text-2xl mb-2"><i class="fa-solid fa-heart"></i></div>
+          <h4 class="font-display font-bold text-sm text-white">Teen Patti</h4>
+          <span class="text-[10px] text-amber-400 font-tech block mt-1">Tournament Coming Soon</span>
+          <p class="text-[11px] text-slate-400 mt-2">High-roller Indian 3-card poker rules & simulation.</p>
+        </div>
+
+        <!-- Carrom Preview -->
+        <div class="vip-glass-card p-4 rounded-xl border border-slate-800 relative overflow-hidden" onclick="showComingSoonModal('Carrom Board Elite', 'Realistic Striker physics, Queen cover rule, Rebound angle calculations.')">
+          <div class="text-cyan-400 text-2xl mb-2"><i class="fa-solid fa-circle-dot"></i></div>
+          <h4 class="font-display font-bold text-sm text-white">Carrom Elite</h4>
+          <span class="text-[10px] text-amber-400 font-tech block mt-1">Tournament Coming Soon</span>
+          <p class="text-[11px] text-slate-400 mt-2">Striker dynamic physics & multi-pocket mechanics.</p>
+        </div>
+
+        <!-- Rummy Preview -->
+        <div class="vip-glass-card p-4 rounded-xl border border-slate-800 relative overflow-hidden" onclick="showComingSoonModal('Indian Rummy 13-Card', '13-card declare, Pure sequence validation, Joker utility mechanics.')">
+          <div class="text-emerald-400 text-2xl mb-2"><i class="fa-solid fa-clone"></i></div>
+          <h4 class="font-display font-bold text-sm text-white">Rummy Pro</h4>
+          <span class="text-[10px] text-amber-400 font-tech block mt-1">Tournament Coming Soon</span>
+          <p class="text-[11px] text-slate-400 mt-2">Pure sets, runs, and declare penalty handbook.</p>
+        </div>
+
+        <!-- 8-Ball Pool Preview -->
+        <div class="vip-glass-card p-4 rounded-xl border border-slate-800 relative overflow-hidden" onclick="showComingSoonModal('8-Ball Pool VIP', 'Cue ball spin physics, solids vs stripes assignment, call-pocket 8-ball rule.')">
+          <div class="text-purple-400 text-2xl mb-2"><i class="fa-solid fa-bowling-ball"></i></div>
+          <h4 class="font-display font-bold text-sm text-white">8-Ball Pool</h4>
+          <span class="text-[10px] text-amber-400 font-tech block mt-1">Tournament Coming Soon</span>
+          <p class="text-[11px] text-slate-400 mt-2">Cue collision engine and pocket guideline preview.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ----------------- SECTION 4: LEADERBOARD TAB ----------------- -->
+    <div id="tab-leaderboard" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="font-display text-2xl font-bold gold-gradient-text">Global Champions Hall</h2>
+          <p class="text-xs text-slate-400">Live Player Rankings & Victory Trophies</p>
+        </div>
+        <div class="text-xs font-tech text-amber-400 bg-amber-500/10 px-3 py-1 rounded border border-amber-500/20">
+          SEASON 14 ACTIVE
+        </div>
+      </div>
+
+      <div class="vip-glass rounded-xl overflow-hidden border border-slate-800 shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left font-tech text-sm">
+            <thead class="bg-slate-900/90 text-slate-400 uppercase text-xs border-b border-slate-800">
+              <tr>
+                <th class="p-3.5">Rank</th>
+                <th class="p-3.5">VIP Contender</th>
+                <th class="p-3.5">Main Arena</th>
+                <th class="p-3.5">Win Rate</th>
+                <th class="p-3.5 text-right">Trophies</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60 font-semibold" id="leaderboardRows">
+              <tr class="hover:bg-amber-500/5 transition">
+                <td class="p-3.5 text-amber-400 font-black text-lg"><i class="fa-solid fa-crown text-amber-400 mr-2"></i>#1</td>
+                <td class="p-3.5 flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-bold">SB</div>
+                  <div>
+                    <span class="text-white block font-sans text-xs font-bold">Saagar Billa (Founder)</span>
+                    <span class="text-[10px] text-amber-400">VIP ELITE</span>
+                  </div>
+                </td>
+                <td class="p-3.5 text-slate-300">Royal Ludo Master</td>
+                <td class="p-3.5 text-emerald-400">98.4%</td>
+                <td class="p-3.5 text-right font-black text-amber-400">14,920 <i class="fa-solid fa-trophy ml-1"></i></td>
+              </tr>
+              <tr class="hover:bg-amber-500/5 transition">
+                <td class="p-3.5 text-slate-300 font-bold text-base"><i class="fa-solid fa-medal text-slate-300 mr-2"></i>#2</td>
+                <td class="p-3.5 flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">NX</div>
+                  <div>
+                    <span class="text-white block font-sans text-xs font-bold">NexusAI Slayer</span>
+                    <span class="text-[10px] text-purple-400">GRANDMASTER</span>
+                  </div>
+                </td>
+                <td class="p-3.5 text-slate-300">Tic Tac Toe / Connect 4</td>
+                <td class="p-3.5 text-emerald-400">94.2%</td>
+                <td class="p-3.5 text-right font-black text-amber-400">12,450 <i class="fa-solid fa-trophy ml-1"></i></td>
+              </tr>
+              <tr class="hover:bg-amber-500/5 transition">
+                <td class="p-3.5 text-amber-600 font-bold text-base"><i class="fa-solid fa-medal text-amber-700 mr-2"></i>#3</td>
+                <td class="p-3.5 flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-cyan-600 text-white flex items-center justify-center font-bold">KR</div>
+                  <div>
+                    <span class="text-white block font-sans text-xs font-bold">KTM_King_99</span>
+                    <span class="text-[10px] text-cyan-400">CHALLENGER</span>
+                  </div>
+                </td>
+                <td class="p-3.5 text-slate-300">Snakes & Ladders Pro</td>
+                <td class="p-3.5 text-emerald-400">89.1%</td>
+                <td class="p-3.5 text-right font-black text-amber-400">10,810 <i class="fa-solid fa-trophy ml-1"></i></td>
+              </tr>
+              <tr class="hover:bg-amber-500/5 transition">
+                <td class="p-3.5 text-slate-400 font-bold">#4</td>
+                <td class="p-3.5 flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-slate-700 text-white flex items-center justify-center font-bold">PK</div>
+                  <div>
+                    <span class="text-white block font-sans text-xs font-bold">PokharaStrike</span>
+                    <span class="text-[10px] text-slate-400">PRO VETERAN</span>
+                  </div>
+                </td>
+                <td class="p-3.5 text-slate-300">Uno Wild Cards</td>
+                <td class="p-3.5 text-emerald-400">82.5%</td>
+                <td class="p-3.5 text-right font-black text-amber-400">8,930 <i class="fa-solid fa-trophy ml-1"></i></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ----------------- SECTION 5: REWARDS TAB ----------------- -->
+    <div id="tab-rewards" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="font-display text-2xl font-bold gold-gradient-text">VIP Trophies & Milestones</h2>
+          <p class="text-xs text-slate-400">Unlock Achievements by Dominating AI and PvP Hotseat</p>
+        </div>
+        <div class="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-tech font-bold rounded">LEVEL 8 VIP</div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="vip-glass-card p-5 rounded-xl border border-amber-500/30">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl mb-3">
+            <i class="fa-solid fa-dice-d20"></i>
+          </div>
+          <h3 class="font-display font-bold text-base text-white">Ludo Bot Slayer</h3>
+          <p class="text-xs text-slate-400 mt-1">Defeat 3 Hard Bots simultaneously in Royal Ludo.</p>
+          <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-xs font-tech">
+            <span class="text-emerald-400 font-bold">UNLOCKED</span>
+            <span class="text-amber-400 font-bold">+5,000 XP</span>
+          </div>
+        </div>
+
+        <div class="vip-glass-card p-5 rounded-xl border border-slate-800">
+          <div class="w-12 h-12 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-2xl mb-3">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <h3 class="font-display font-bold text-base text-white">Minimax Conqueror</h3>
+          <p class="text-xs text-slate-400 mt-1">Force a draw or win against the unbeatable Tic-Tac-Toe AI.</p>
+          <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-xs font-tech">
+            <span class="text-cyan-400 font-bold">IN PROGRESS (3/5)</span>
+            <span class="text-amber-400 font-bold">+2,500 XP</span>
+          </div>
+        </div>
+
+        <div class="vip-glass-card p-5 rounded-xl border border-slate-800">
+          <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl mb-3">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <h3 class="font-display font-bold text-base text-white">Grandmaster Crown</h3>
+          <p class="text-xs text-slate-400 mt-1">Achieve a 10-win streak across all playable engines.</p>
+          <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-xs font-tech">
+            <span class="text-slate-500 font-bold">LOCKED</span>
+            <span class="text-amber-400 font-bold">+10,000 XP</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ----------------- SECTION 6: PROFILE TAB ----------------- -->
+    <div id="tab-profile" class="tab-content hidden space-y-6">
+      <div class="vip-glass rounded-2xl p-6 border border-amber-500/30 flex flex-col md:flex-row items-center gap-6">
+        <div class="relative">
+          <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-amber-600 via-yellow-400 to-amber-200 p-1 shadow-gold-glow">
+            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-4xl text-amber-400 font-display font-black">
+              B
+            </div>
+          </div>
+          <span class="absolute -bottom-2 -right-2 px-2 py-0.5 rounded bg-emerald-500 text-slate-950 font-tech font-black text-[10px] uppercase">Online</span>
+        </div>
+
+        <div class="space-y-1 text-center md:text-left flex-1">
+          <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
+            <h2 class="font-display text-2xl font-bold text-white">VIP Player #9825</h2>
+            <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 text-xs font-tech font-bold uppercase">Gold Patron</span>
+          </div>
+          <p class="text-xs text-slate-400 font-mono">BILLA Member Since: Nov 2024 • ID: BIL-8829-NEP</p>
+          
+          <div class="pt-3 grid grid-cols-3 gap-3 font-tech text-center max-w-md">
+            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+              <div class="text-[11px] text-slate-400 uppercase">Matches</div>
+              <div class="text-lg font-bold text-amber-400" id="userMatchesCount">342</div>
+            </div>
+            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+              <div class="text-[11px] text-slate-400 uppercase">Victories</div>
+              <div class="text-lg font-bold text-emerald-400" id="userWinsCount">289</div>
+            </div>
+            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+              <div class="text-[11px] text-slate-400 uppercase">Win Ratio</div>
+              <div class="text-lg font-bold text-cyan-400">84.5%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ----------------- SECTION 7: HELP & RULES TAB ----------------- -->
+    <div id="tab-help" class="tab-content hidden space-y-6">
+      <div>
+        <h2 class="font-display text-2xl font-bold gold-gradient-text">Gaming Rulebook & Platform Guide</h2>
+        <p class="text-xs text-slate-400">Official tournament standards and AI mechanics explained</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-sans">
+        <div class="vip-glass-card p-5 rounded-xl border border-slate-800 space-y-2">
+          <h3 class="font-display font-bold text-amber-400 text-base"><i class="fa-solid fa-dice text-amber-400 mr-2"></i>Royal Ludo Engine Rules</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">• Rolling a 6 unlocks a token from yard or earns an extra roll.</p>
+          <p class="text-xs text-slate-300 leading-relaxed">• Landing on an opponent's token eliminates them back to their yard with victory taunts.</p>
+          <p class="text-xs text-slate-300 leading-relaxed">• Sockets marked with Stars (★) are safe zones where no captures can occur.</p>
+          <p class="text-xs text-slate-300 leading-relaxed">• Switch seamlessly between 1 Bot, 2 Bots, or 3 Bots mode.</p>
+        </div>
+
+        <div class="vip-glass-card p-5 rounded-xl border border-slate-800 space-y-2">
+          <h3 class="font-display font-bold text-emerald-400 text-base"><i class="fa-solid fa-stairs mr-2"></i>Snakes & Ladders Rules</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">• Exact roll not mandatory until the finish zone at 100.</p>
+          <p class="text-xs text-slate-300 leading-relaxed">• Ladder bases immediately elevate tokens up to the apex.</p>
+          <p class="text-xs text-slate-300 leading-relaxed">• Snake heads swallow the token, sliding it down into the snake tail coordinate.</p>
+        </div>
+
+        <div class="vip-glass-card p-5 rounded-xl border border-slate-800 space-y-2">
+          <h3 class="font-display font-bold text-purple-400 text-base"><i class="fa-solid fa-brain mr-2"></i>Tic Tac Toe Minimax Intelligence</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">• Bot mode calculates the recursive game tree (Minimax algorithm) guaranteeing it never loses a match.</p>
+          <p class="text-xs text-slate-300 leading-relaxed">• Perfect testing ground for human tactical defense.</p>
+        </div>
+
+        <div class="vip-glass-card p-5 rounded-xl border border-slate-800 space-y-2">
+          <h3 class="font-display font-bold text-cyan-400 text-base"><i class="fa-solid fa-circle-nodes mr-2"></i>Connect Four Block AI</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">• Drops tokens down lowest available slot in chosen column.</p>
+          <p class="text-xs text-slate-300 leading-relaxed">• AI scans 4-way vectors (horizontal, vertical, both diagonals) to instantly block 3-in-a-row threats.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ----------------- SECTION 8: SETTINGS TAB ----------------- -->
+    <div id="tab-settings" class="tab-content hidden space-y-6">
+      <div>
+        <h2 class="font-display text-2xl font-bold gold-gradient-text">Platform Preferences</h2>
+        <p class="text-xs text-slate-400">Audio, Visual Effects, & Session Controls</p>
+      </div>
+
+      <div class="vip-glass-card p-5 rounded-xl border border-slate-800 max-w-xl space-y-4">
+        
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div>
+            <div class="font-bold text-sm text-white">Ambient VIP Lounge Music</div>
+            <div class="text-xs text-slate-400">Gentle relaxing synthesized game soundtrack</div>
+          </div>
+          <button onclick="toggleBgm()" id="settingsMusicBtn" class="px-3 py-1 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 text-xs font-tech font-bold">ACTIVE</button>
+        </div>
+
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div>
+            <div class="font-bold text-sm text-white">Victory & Taunt Audio Effects</div>
+            <div class="text-xs text-slate-400">Playful elimination and victory beat sounds</div>
+          </div>
+          <button onclick="toggleTauntSfx()" id="settingsSfxBtn" class="px-3 py-1 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-tech font-bold">ENABLED</button>
+        </div>
+
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div>
+            <div class="font-bold text-sm text-white">Confetti Celebrations</div>
+            <div class="text-xs text-slate-400">Visual particle bursts when winning matches</div>
+          </div>
+          <button class="px-3 py-1 rounded bg-slate-800 text-slate-300 text-xs font-tech font-bold">ENABLED</button>
+        </div>
+
+        <div class="pt-2">
+          <button onclick="resetAllCustomStyles()" class="text-xs text-red-400 hover:underline font-tech font-bold">
+            <i class="fa-solid fa-trash-can mr-1"></i> Reset Custom Session Wallpapers & Sounds
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= SECURE ADMIN LOGIN MODAL ================= -->
+  <div id="adminLoginModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="vip-glass rounded-2xl p-6 sm:p-8 max-w-md w-full border border-amber-500/40 shadow-gold-glow modal-backdrop relative">
+      
+      <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center space-y-2 mb-6">
+        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 mx-auto flex items-center justify-center text-xl">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h3 class="font-display text-xl font-black gold-gradient-text">BILLA MAINFRAME LOGIN</h3>
+        <p class="text-xs text-slate-400">Authorized Operator Credentials Required</p>
+      </div>
+
+      <form id="adminLoginForm" onsubmit="handleAdminAuth(event)" class="space-y-4 font-tech">
+        <div>
+          <label class="block text-xs uppercase text-slate-400 font-bold mb-1">Admin Username</label>
+          <input type="text" id="adminUser" required placeholder="Enter ID" class="w-full px-3.5 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs uppercase text-slate-400 font-bold mb-1">Access Password</label>
+          <input type="password" id="adminPass" required placeholder="Enter Secret Code" class="w-full px-3.5 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-amber-400 text-sm" />
+        </div>
+
+        <div id="adminAuthErr" class="hidden text-xs text-rose-400 font-bold text-center bg-rose-500/10 py-1.5 rounded border border-rose-500/30">
+          Invalid Operator Credentials
+        </div>
+
+        <button type="submit" class="w-full py-2.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm tracking-wide shadow-gold-glow transition">
+          AUTHENTICATE MAINFRAME
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= LIVE ADMIN DASHBOARD MODAL ================= -->
+  <div id="adminDashboardModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-6">
+    <div class="vip-glass rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-amber-500/40 shadow-2xl modal-backdrop p-5 sm:p-7 space-y-6">
+      
+      <!-- Admin Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-amber-500/20">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-lg">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-black text-lg text-white">BILLA LIVE MAINFRAME</h3>
+            <span class="text-[11px] text-emerald-400 font-tech font-bold uppercase"><i class="fa-solid fa-circle-dot text-[8px] mr-1"></i> Root Operator Session #9825935341</span>
+          </div>
+        </div>
+        <button onclick="closeAdminDashboard()" class="px-3 py-1 rounded bg-slate-800 text-slate-300 hover:text-white text-xs font-tech">
+          <i class="fa-solid fa-xmark mr-1"></i> Exit Mainframe
+        </button>
+      </div>
+
+      <!-- Live Analytical Metrics -->
+      <div>
+        <h4 class="text-xs uppercase tracking-wider text-amber-400 font-tech font-bold mb-3"><i class="fa-solid fa-chart-line mr-1"></i> Live System Metrics</h4>
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 font-tech text-center">
+          <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800">
+            <div class="text-[10px] text-slate-400 uppercase">Total Visits</div>
+            <div id="metricTotalVisits" class="text-xl font-black text-amber-400 mt-1">148,920</div>
+          </div>
+          <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800">
+            <div class="text-[10px] text-slate-400 uppercase">Today's Visits</div>
+            <div id="metricTodayVisits" class="text-xl font-black text-emerald-400 mt-1">12,490</div>
+          </div>
+          <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800">
+            <div class="text-[10px] text-slate-400 uppercase">Online Users Now</div>
+            <div id="metricOnlineUsers" class="text-xl font-black text-cyan-400 mt-1">1,482</div>
+          </div>
+          <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800">
+            <div class="text-[10px] text-slate-400 uppercase">Registered Players</div>
+            <div id="metricRegPlayers" class="text-xl font-black text-purple-400 mt-1">89,204</div>
+          </div>
+          <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 col-span-2 sm:col-span-1">
+            <div class="text-[10px] text-slate-400 uppercase">Games Played</div>
+            <div id="metricGamesPlayed" class="text-xl font-black text-rose-400 mt-1">624,190</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Universal Session Overrides -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Override 1: Background Uploader -->
+        <div class="vip-glass-card p-4 rounded-xl border border-slate-800 space-y-3 font-tech">
+          <div class="flex items-center gap-2 text-amber-400">
+            <i class="fa-solid fa-image"></i>
+            <h5 class="font-bold text-sm text-white">Live Background Wallpaper Texture</h5>
+          </div>
+          <p class="text-xs text-slate-400">Upload any image file to instantly replace the site-wide canvas backdrop texture for this session.</p>
+          <input type="file" id="adminBgInput" accept="image/*" onchange="handleAdminBgUpload(event)" class="w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-tech file:bg-amber-500 file:text-slate-950 file:cursor-pointer hover:file:bg-amber-400 cursor-pointer" />
+          <div id="adminBgStatus" class="text-[11px] text-emerald-400 font-bold hidden">Wallpaper active!</div>
+        </div>
+
+        <!-- Override 2: Teasing Victory Audio Track Uploader -->
+        <div class="vip-glass-card p-4 rounded-xl border border-slate-800 space-y-3 font-tech">
+          <div class="flex items-center gap-2 text-amber-400">
+            <i class="fa-solid fa-music"></i>
+            <h5 class="font-bold text-sm text-white">Teasing Victory Audio Uploader</h5>
+          </div>
+          <p class="text-xs text-slate-400">Upload a custom `.mp3` or `.wav` track to play a Nepali-style celebratory teasing victory effect whenever any match is won.</p>
+          <input type="file" id="adminAudioInput" accept="audio/*" onchange="handleAdminAudioUpload(event)" class="w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-tech file:bg-amber-500 file:text-slate-950 file:cursor-pointer hover:file:bg-amber-400 cursor-pointer" />
+          <div id="adminAudioStatus" class="text-[11px] text-emerald-400 font-bold hidden">Victory Taunt Track Loaded in Memory!</div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= PREVIEW / COMING SOON MODAL ================= -->
+  <div id="comingSoonModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="vip-glass rounded-2xl p-6 max-w-md w-full border border-amber-500/40 shadow-gold-glow modal-backdrop relative">
+      <button onclick="closeComingSoonModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center space-y-3">
+        <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 mx-auto flex items-center justify-center text-2xl animate-bounce">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h3 id="csModalTitle" class="font-display font-black text-xl text-white">Tournament Coming Soon</h3>
+        <span class="inline-block px-3 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-tech font-bold text-xs uppercase border border-amber-500/30">Grandmaster Series</span>
+        <div class="text-left bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-2 mt-3">
+          <div class="font-bold text-amber-400 font-tech uppercase text-[11px]">Official Rulebook & Bot Logic:</div>
+          <p id="csModalDesc" class="leading-relaxed"></p>
+        </div>
+        <button onclick="closeComingSoonModal()" class="w-full py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-tech font-bold text-sm">Understood</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= AUDIO SYNTHESIS & WEBAUDIO ENGINE ================= -->
+  <script>
+    // Web Audio API Sound Generator for ambient lounge, dice rolls, captures, and victory
+    let audioCtx = null;
+    let bgmInterval = null;
+    let isBgmPlaying = false;
+    let isTauntSfxEnabled = true;
+    let customVictoryAudioBlobUrl = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Playful Synthesized SFX: Elimination / Capture Mocking Sound
+    function playCaptureSfx() {
+      if (!isTauntSfxEnabled) return;
+      initAudio();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      
+      // Pitch drop with wobble for mock teasing
+      const now = audioCtx.currentTime;
+      osc.frequency.setValueAtTime(450, now);
+      osc.frequency.exponentialRampToValueAtTime(110, now + 0.35);
+      
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.36);
+    }
+
+    // Realistic Wooden / Plastic Dice Clatter Sound
+    function playDiceClatterSfx() {
+      initAudio();
+      for (let i = 0; i < 4; i++) {
+        setTimeout(() => {
+          if (!audioCtx) return;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          const freq = 180 + Math.random() * 260;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.09);
+        }, i * 70);
+      }
+    }
+
+    // Victory Celebration Taunt Sound (Plays custom audio if uploaded, or playful fanfare)
+    function playVictoryTauntAudio(winnerName = "Champion") {
+      if (customVictoryAudioBlobUrl) {
+        const audio = new Audio(customVictoryAudioBlobUrl);
+        audio.play().catch(e => console.log(e));
+        return;
+      }
+      if (!isTauntSfxEnabled) return;
+      initAudio();
+      
+      // Light celebratory arpeggio fanfare
+      const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+      notes.forEach((freq, idx) => {
+        setTimeout(() => {
+          if (!audioCtx) return;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.45);
+        }, idx * 110);
+      });
+    }
+
+    // Gentle Ambient VIP Lounge Synth Loop
+    function startVIPLoungeMusic() {
+      if (bgmInterval) return;
+      initAudio();
+      isBgmPlaying = true;
+      document.getElementById('bgmStatusText').innerText = "Music ON";
+      document.getElementById('bgmIcon').className = "fa-solid fa-volume-high text-amber-400";
+      
+      const chords = [
+        [220, 261.63, 329.63], // A minor
+        [174.61, 220, 261.63], // F major
+        [130.81, 164.81, 196.00], // C major
+        [196.00, 246.94, 293.66]  // G major
+      ];
+      let chordIndex = 0;
+
+      function playChord() {
+        if (!isBgmPlaying || !audioCtx) return;
+        const currentChord = chords[chordIndex % chords.length];
+        chordIndex++;
+        currentChord.forEach(freq => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.025, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3.8);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 3.9);
+        });
+      }
+
+      playChord();
+      bgmInterval = setInterval(playChord, 4000);
+    }
+
+    function stopVIPLoungeMusic() {
+      if (bgmInterval) {
+        clearInterval(bgmInterval);
+        bgmInterval = null;
+      }
+      isBgmPlaying = false;
+      document.getElementById('bgmStatusText').innerText = "Music OFF";
+      document.getElementById('bgmIcon').className = "fa-solid fa-volume-xmark text-slate-500";
+    }
+
+    function toggleBgm() {
+      if (isBgmPlaying) {
+        stopVIPLoungeMusic();
+      } else {
+        startVIPLoungeMusic();
+      }
+    }
+
+    function toggleTauntSfx() {
+      isTauntSfxEnabled = !isTauntSfxEnabled;
+      const btn = document.getElementById('settingsSfxBtn');
+      if (isTauntSfxEnabled) {
+        btn.innerText = "ENABLED";
+        btn.className = "px-3 py-1 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-tech font-bold";
+      } else {
+        btn.innerText = "MUTED";
+        btn.className = "px-3 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700 text-xs font-tech font-bold";
+      }
+    }
+
+    // Auto trigger audio context unlock on first user click
+    window.addEventListener('click', () => {
+      if (!audioCtx) {
+        initAudio();
+        startVIPLoungeMusic();
+      }
+    }, { once: true });
+  </script>
+
+  <!-- ================= CORE PLATFORM NAVIGATION & ADMIN ENGINE ================= -->
+  <script>
+    let currentGameKey = 'ludo';
+    let currentMode = 'bot'; // 'bot' or 'pvp'
+    let ludoBotCount = 3;    // 1, 2, or 3 bots
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      const activeContent = document.getElementById('tab-' + tabId);
+      if (activeContent) activeContent.classList.remove('hidden');
+
+      // Update Nav Buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabId) {
+          btn.classList.add('text-amber-400', 'bg-amber-400/10');
+          btn.classList.remove('text-slate-300');
+        } else {
+          btn.classList.remove('text-amber-400', 'bg-amber-400/10');
+          btn.classList.add('text-slate-300');
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleMobileNav() {
+      const menu = document.getElementById('mobileNavMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    function setGameMode(mode) {
+      currentMode = mode;
+      const botBtn = document.getElementById('modeBotBtn');
+      const pvpBtn = document.getElementById('modePvpBtn');
+      if (mode === 'bot') {
+        botBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded bg-amber-500 text-slate-950 transition";
+        pvpBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded text-slate-300 hover:text-white transition";
+      } else {
+        pvpBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded bg-amber-500 text-slate-950 transition";
+        botBtn.className = "px-3 py-1 text-xs sm:text-sm font-bold rounded text-slate-300 hover:text-white transition";
+      }
+      restartCurrentGame();
+    }
+
+    function setLudoBotCount(count) {
+      ludoBotCount = count;
+      [1, 2, 3].forEach(c => {
+        const btn = document.getElementById(`ludoBot${c}Btn`);
+        if (btn) {
+          if (c === count) {
+            btn.className = "px-2 py-0.5 text-xs font-black rounded bg-amber-500 text-slate-950";
+          } else {
+            btn.className = "px-2 py-0.5 text-xs font-bold rounded bg-slate-800 text-slate-300 hover:bg-amber-400 hover:text-slate-950";
+          }
+        }
+      });
+      if (currentGameKey === 'ludo') {
+        initLudoGame();
+      }
+    }
+
+    function launchGame(key) {
+      currentGameKey = key;
+      switchTab('play');
+      const botSelector = document.getElementById('ludoBotCountSelector');
+      if (key === 'ludo' && currentMode === 'bot') {
+        botSelector.classList.remove('hidden');
+        botSelector.classList.add('flex');
+      } else {
+        botSelector.classList.add('hidden');
+        botSelector.classList.remove('flex');
+      }
+
+      const titles = {
+        'ludo': { title: 'Royal Ludo Tournament', sub: 'Traditional 4-Yard Cross • Kinetic 3D Dice' },
+        'snakes': { title: 'Snakes & Ladders VIP', sub: '100-Grid Vector Adventure • Bot AI' },
+        'tictactoe': { title: 'Tic Tac Toe Glow', sub: 'Minimax Unbeatable AI • Hotseat PvP' },
+        'connect4': { title: 'Connect Four Neon', sub: 'Tactical Gravity 7x6 Matrix • Predictive AI' },
+        'checkers': { title: 'Checkers VIP', sub: '8x8 Crown & Diagonal Multi-Jump Engine' },
+        'uno': { title: 'Uno-Style Cards', sub: 'Color Matching, Action, Wild Cards AI' },
+        'dominoes': { title: 'Classic Dominoes', sub: 'Pip Matching Bone-Yard Engine' }
+      };
+
+      if (titles[key]) {
+        document.getElementById('activeGameTitle').innerText = titles[key].title;
+        document.getElementById('activeGameSub').innerText = titles[key].sub;
+      }
+
+      if (key === 'ludo') initLudoGame();
+      else if (key === 'snakes') initSnakesGame();
+      else if (key === 'tictactoe') initTicTacToeGame();
+      else if (key === 'connect4') initConnect4Game();
+      else if (key === 'checkers') initCheckersGame();
+      else if (key === 'uno') initUnoGame();
+      else if (key === 'dominoes') initDominoesGame();
+    }
+
+    function restartCurrentGame() {
+      launchGame(currentGameKey);
+    }
+
+    // Trigger Win Celebration Confetti & Taunt
+    function triggerVictoryCelebration(winnerTitle) {
+      playVictoryTauntAudio(winnerTitle);
+      if (window.confetti) {
+        confetti({
+          particleCount: 90,
+          spread: 75,
+          origin: { y: 0.6 },
+          colors: ['#fbbf24', '#f59e0b', '#10b981', '#06b6d4', '#ec4899']
+        });
+      }
+    }
+
+    // Admin Authentication Handlers
+    function openAdminModal() {
+      document.getElementById('adminLoginModal').classList.remove('hidden');
+    }
+    function closeAdminModal() {
+      document.getElementById('adminLoginModal').classList.add('hidden');
+      document.getElementById('adminAuthErr').classList.add('hidden');
+    }
+    function handleAdminAuth(e) {
+      e.preventDefault();
+      const u = document.getElementById('adminUser').value.trim();
+      const p = document.getElementById('adminPass').value.trim();
+      if (u === '9825935341' && p === '9825935341') {
+        closeAdminModal();
+        document.getElementById('adminDashboardModal').classList.remove('hidden');
+      } else {
+        document.getElementById('adminAuthErr').classList.remove('hidden');
+      }
+    }
+    function closeAdminDashboard() {
+      document.getElementById('adminDashboardModal').classList.add('hidden');
+    }
+
+    // Live Metrics Interval Simulation
+    let metrics = {
+      totalVisits: 148920,
+      todayVisits: 12490,
+      onlineUsers: 1482,
+      regPlayers: 89204,
+      gamesPlayed: 624190
+    };
+
+    setInterval(() => {
+      metrics.onlineUsers += Math.floor(Math.random() * 5) - 2;
+      if (metrics.onlineUsers < 1100) metrics.onlineUsers = 1350;
+      metrics.totalVisits += Math.floor(Math.random() * 3);
+      metrics.gamesPlayed += Math.floor(Math.random() * 2);
+
+      const elTotal = document.getElementById('metricTotalVisits');
+      const elToday = document.getElementById('metricTodayVisits');
+      const elOnline = document.getElementById('metricOnlineUsers');
+      const elGames = document.getElementById('metricGamesPlayed');
+
+      if (elTotal) elTotal.innerText = metrics.totalVisits.toLocaleString();
+      if (elToday) elToday.innerText = metrics.todayVisits.toLocaleString();
+      if (elOnline) elOnline.innerText = metrics.onlineUsers.toLocaleString();
+      if (elGames) elGames.innerText = metrics.gamesPlayed.toLocaleString();
+
+      const elTotalHome = document.getElementById('statTotalVisitsHome');
+      const elOnlineHome = document.getElementById('statOnlineHome');
+      const elGamesHome = document.getElementById('statGamesPlayedHome');
+      if (elTotalHome) elTotalHome.innerText = metrics.totalVisits.toLocaleString();
+      if (elOnlineHome) elOnlineHome.innerText = metrics.onlineUsers.toLocaleString();
+      if (elGamesHome) elGamesHome.innerText = metrics.gamesPlayed.toLocaleString();
+    }, 2400);
+
+    // Live Admin Wallpaper Override
+    function handleAdminBgUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.body.style.backgroundImage = `url('${e.target.result}')`;
+          document.body.style.backgroundSize = 'cover';
+          document.body.style.backgroundPosition = 'center';
+          document.getElementById('adminBgStatus').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Live Admin Victory Audio Taunt Override
+    function handleAdminAudioUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        customVictoryAudioBlobUrl = URL.createObjectURL(file);
+        document.getElementById('adminAudioStatus').classList.remove('hidden');
+      }
+    }
+
+    function resetAllCustomStyles() {
+      document.body.style.backgroundImage = '';
+      customVictoryAudioBlobUrl = null;
+      alert("Custom styles and uploaded audio have been reset to factory defaults.");
+    }
+
+    // Coming soon modal
+    function showComingSoonModal(title, desc) {
+      document.getElementById('csModalTitle').innerText = title;
+      document.getElementById('csModalDesc').innerText = desc;
+      document.getElementById('comingSoonModal').classList.remove('hidden');
+    }
+    function closeComingSoonModal() {
+      document.getElementById('comingSoonModal').classList.add('hidden');
+    }
+  </script>
+
+  <!-- ================= 1. ROYAL LUDO FULL ENGINE ================= -->
+  <script>
+    let ludoState = null;
+
+    function initLudoGame() {
+      const stage = document.getElementById('gameViewport');
+      stage.innerHTML = `
+        <div class="w-full max-w-2xl flex flex-col items-center gap-4">
+          <!-- Game Info Banner -->
+          <div class="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-800 font-tech">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400">Current Turn:</span>
+              <span id="ludoCurrentPlayerTag" class="px-2.5 py-0.5 rounded text-xs font-black uppercase text-red-400 bg-red-500/20 border border-red-500/30 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-red-500 inline-block animate-pulse"></span> Red (Player)
+              </span>
+            </div>
+            <div id="ludoStatusMsg" class="text-xs text-amber-300 font-bold">Roll the 3D dice!</div>
+          </div>
+
+          <!-- Ludo Cross Board + Control Stage -->
+          <div class="relative flex flex-col md:flex-row items-center justify-center gap-6 w-full">
+            
+            <!-- Authentic Ludo Canvas / SVG Grid Container -->
+            <div class="relative w-[340px] h-[340px] sm:w-[420px] sm:h-[420px] bg-slate-950 rounded-2xl p-2.5 border-2 border-amber-500/30 shadow-2xl overflow-hidden" id="ludoBoardContainer">
+              <svg id="ludoSvgBoard" viewBox="0 0 15 15" class="w-full h-full rounded-xl">
+                <!-- Red Yard -->
+                <rect x="0" y="0" width="6" height="6" fill="#dc2626" rx="0.5" />
+                <rect x="1" y="1" width="4" height="4" fill="#1e1b4b" rx="0.5" />
+                
+                <!-- Green Yard -->
+                <rect x="9" y="0" width="6" height="6" fill="#16a34a" rx="0.5" />
+                <rect x="10" y="1" width="4" height="4" fill="#1e1b4b" rx="0.5" />
+
+                <!-- Yellow Yard -->
+                <rect x="9" y="9" width="6" height="6" fill="#ca8a04" rx="0.5" />
+                <rect x="10" y="10" width="4" height="4" fill="#1e1b4b" rx="0.5" />
+
+                <!-- Blue Yard -->
+                <rect x="0" y="9" width="6" height="6" fill="#2563eb" rx="0.5" />
+                <rect x="1" y="10" width="4" height="4" fill="#1e1b4b" rx="0.5" />
+
+                <!-- Center Home Victory Square -->
+                <polygon points="6,6 9,6 7.5,7.5" fill="#16a34a" />
+                <polygon points="9,6 9,9 7.5,7.5" fill="#ca8a04" />
+                <polygon points="9,9 6,9 7.5,7.5" fill="#2563eb" />
+                <polygon points="6,9 6,6 7.5,7.5" fill="#dc2626" />
+
+                <!-- Grid Cells & Home Paths -->
+                <!-- Red Path Column -->
+                <rect x="1" y="7" width="5" height="1" fill="#dc2626" opacity="0.8" />
+                <rect x="1" y="6" width="1" height="1" fill="#dc2626" />
+                
+                <!-- Green Path Column -->
+                <rect x="7" y="1" width="1" height="5" fill="#16a34a" opacity="0.8" />
+                <rect x="8" y="1" width="1" height="1" fill="#16a34a" />
+
+                <!-- Yellow Path Column -->
+                <rect x="9" y="7" width="5" height="1" fill="#ca8a04" opacity="0.8" />
+                <rect x="13" y="8" width="1" height="1" fill="#ca8a04" />
+
+                <!-- Blue Path Column -->
+                <rect x="7" y="9" width="1" height="5" fill="#2563eb" opacity="0.8" />
+                <rect x="6" y="13" width="1" height="1" fill="#2563eb" />
+
+                <!-- Grid Lines -->
+                <path d="
+                  M6,0 L6,15 M9,0 L9,15 M0,6 L15,6 M0,9 L15,9
+                  M6,1 L9,1 M6,2 L9,2 M6,3 L9,3 M6,4 L9,4 M6,5 L9,5
+                  M6,10 L9,10 M6,11 L9,11 M6,12 L9,12 M6,13 L9,13 M6,14 L9,14
+                  M0,7 L6,7 M9,7 L15,7 M0,8 L6,8 M9,8 L15,8
+                  M1,6 L1,9 M2,6 L2,9 M3,6 L3,9 M4,6 L4,9 M5,6 L5,9
+                  M10,6 L10,9 M11,6 L11,9 M12,6 L12,9 M13,6 L13,9 M14,6 L14,9
+                " stroke="#334155" stroke-width="0.06" fill="none" />
+
+                <!-- Safety Stars (★) -->
+                <text x="1.5" y="6.7" fill="#ffffff" font-size="0.6" text-anchor="middle" font-weight="bold">★</text>
+                <text x="8.5" y="1.7" fill="#ffffff" font-size="0.6" text-anchor="middle" font-weight="bold">★</text>
+                <text x="13.5" y="8.7" fill="#ffffff" font-size="0.6" text-anchor="middle" font-weight="bold">★</text>
+                <text x="6.5" y="13.7" fill="#ffffff" font-size="0.6" text-anchor="middle" font-weight="bold">★</text>
+                <text x="2.5" y="8.7" fill="#ffffff" font-size="0.6" text-anchor="middle" font-weight="bold">★</text>
+                <text x="8.5" y="2.7" fill="#ffffff" font-size="0.6" text-anchor="middle" font-weight="bold">★</text>
+                <text x="12.5" y="6.7" fill="#ffffff" font-size="0.6" text-anchor="middle" font-weight="bold">★</text>
+                <text x="6.5" y="12.7" fill="#ffffff" font-size="0.6" text-anchor="middle" font-weight="bold">★</text>
+              </svg>
+
+              <!-- Dynamic Tokens Overlay Layer -->
+              <div id="ludoTokenLayer" class="absolute inset-0 p-2.5 pointer-events-none"></div>
+            </div>
+
+            <!-- 3D Kinetic Dice & Turn Action Panel -->
+            <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-slate-900/90 border border-amber-500/20 w-48 space-y-4">
+              <div class="text-center">
+                <span class="text-[11px] font-tech text-slate-400 uppercase tracking-widest block">3D Realistic Dice</span>
+                <span id="ludoDiceValBadge" class="text-xs font-black text-amber-400 font-tech">Ready</span>
+              </div>
+
+              <!-- Interactive 3D Dice Object -->
+              <div class="dice-cube" id="ludoDiceCube" onclick="handleLudoDiceClick()">
+                <!-- Face 1 -->
+                <div class="dice-face dice-face-1">
+                  <div></div><div></div><div></div>
+                  <div></div><div class="pip red-pip"></div><div></div>
+                  <div></div><div></div><div></div>
+                </div>
+                <!-- Face 2 -->
+                <div class="dice-face dice-face-2">
+                  <div class="pip"></div><div></div><div></div>
+                  <div></div><div></div><div></div>
+                  <div></div><div></div><div class="pip"></div>
+                </div>
+                <!-- Face 3 -->
+                <div class="dice-face dice-face-3">
+                  <div class="pip"></div><div></div><div></div>
+                  <div></div><div class="pip"></div><div></div>
+                  <div></div><div></div><div class="pip"></div>
+                </div>
+                <!-- Face 4 -->
+                <div class="dice-face dice-face-4">
+                  <div class="pip"></div><div></div><div class="pip"></div>
+                  <div></div><div></div><div></div>
+                  <div class="pip"></div><div></div><div class="pip"></div>
+                </div>
+                <!-- Face 5 -->
+                <div class="dice-face dice-face-5">
+                  <div class="pip"></div><div></div><div class="pip"></div>
+                  <div></div><div class="pip"></div><div></div>
+                  <div class="pip"></div><div></div><div class="pip"></div>
+                </div>
+                <!-- Face 6 -->
+                <div class="dice-face dice-face-6">
+                  <div class="pip"></div><div></div><div class="pip"></div>
+                  <div class="pip"></div><div></div><div class="pip"></div>
+                  <div class="pip"></div><div></div><div class="pip"></div>
+                </div>
+              </div>
+
+              <button id="ludoRollBtn" onclick="handleLudoDiceClick()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-tech font-black text-sm tracking-wider shadow-gold-glow transition active:scale-95">
+                <i class="fa-solid fa-dice mr-1"></i> ROLL DICE
+              </button>
+            </div>
+
+          </div>
+        </div>
+      `;
+
+      // Define Complete Coordinate Board Mapping for Ludo (52 Main Path Cells + 5 Home Cells each)
+      const mainPathCoords = [
+        [1,6],[2,6],[3,6],[4,6],[5,6], // 0-4
+        [6,5],[6,4],[6,3],[6,2],[6,1],[6,0], // 5-10
+        [7,0], // 11
+        [8,0],[8,1],[8,2],[8,3],[8,4],[8,5], // 12-17
+        [9,6],[10,6],[11,6],[12,6],[13,6],[14,6], // 18-23
+        [14,7], // 24
+        [14,8],[13,8],[12,8],[11,8],[10,8],[9,8], // 25-30
+        [8,9],[8,10],[8,11],[8,12],[8,13],[8,14], // 31-36
+        [7,14], // 37
+        [6,14],[6,13],[6,12],[6,11],[6,10],[6,9], // 38-43
+        [5,8],[4,8],[3,8],[2,8],[1,8],[0,8], // 44-49
+        [0,7], // 50
+        [0,6]  // 51
+      ];
+
+      const homeStretch = {
+        red: [[1,7],[2,7],[3,7],[4,7],[5,7],[7,7]],
+        green: [[7,1],[7,2],[7,3],[7,4],[7,5],[7,7]],
+        yellow: [[13,7],[12,7],[11,7],[10,7],[9,7],[7,7]],
+        blue: [[7,13],[7,12],[7,11],[7,10],[7,9],[7,7]]
+      };
+
+      const yardCoords = {
+        red: [[2,2],[3,2],[2,3],[3,3]],
+        green: [[11,2],[12,2],[11,3],[12,3]],
+        yellow: [[11,11],[12,11],[11,12],[12,12]],
+        blue: [[2,11],[3,11],[2,12],[3,12]]
+      };
+
+      // State Setup
+      const playersList = ['red', 'green', 'yellow', 'blue'];
+      const activePlayers = (currentMode === 'pvp') ? playersList : ['red', ...playersList.slice(1, ludoBotCount + 1)];
+
+      ludoState = {
+        players: activePlayers,
+        turnIndex: 0,
+        diceValue: 6,
+        isRolling: false,
+        hasRolled: false,
+        tokens: {
+          red: [0, 0, 0, 0].map(() => ({ step: -1 })), // -1 = yard, 0..50 = main, 51..56 = home
+          green: [0, 0, 0, 0].map(() => ({ step: -1 })),
+          yellow: [0, 0, 0, 0].map(() => ({ step: -1 })),
+          blue: [0, 0, 0, 0].map(() => ({ step: -1 }))
+        },
+        mainCoords: mainPathCoords,
+        homeCoords: homeStretch,
+        yards: yardCoords,
+        startIndex: { red: 0, green: 13, yellow: 26, blue: 39 }
+      };
+
+      renderLudoTokens();
+    }
+
+    function renderLudoTokens() {
+      const layer = document.getElementById('ludoTokenLayer');
+      if (!layer || !ludoState) return;
+      layer.innerHTML = '';
+
+      const colors = ['red', 'green', 'yellow', 'blue'];
+      const colorBg = {
+        red: 'bg-red-500',
+        green: 'bg-emerald-500',
+        yellow: 'bg-yellow-400',
+        blue: 'bg-blue-500'
+      };
+
+      colors.forEach(col => {
+        if (!ludoState.tokens[col]) return;
+        ludoState.tokens[col].forEach((tok, idx) => {
+          let x = 0, y = 0;
+          if (tok.step === -1) {
+            // In Yard
+            const c = ludoState.yards[col][idx];
+            x = (c[0] / 15) * 100 + 1.2;
+            y = (c[1] / 15) * 100 + 1.2;
+          } else if (tok.step >= 0 && tok.step < 51) {
+            // Main Path
+            const globalIdx = (ludoState.startIndex[col] + tok.step) % 52;
+            const c = ludoState.mainCoords[globalIdx];
+            x = (c[0] / 15) * 100 + 1.2;
+            y = (c[1] / 15) * 100 + 1.2;
+          } else if (tok.step >= 51 && tok.step <= 56) {
+            // Home Stretch
+            const homeIdx = Math.min(tok.step - 51, 5);
+            const c = ludoState.homeCoords[col][homeIdx];
+            x = (c[0] / 15) * 100 + 1.2;
+            y = (c[1] / 15) * 100 + 1.2;
+          }
+
+          const tokenEl = document.createElement('div');
+          const isCurrentTurnColor = ludoState.players[ludoState.turnIndex] === col;
+          const canMove = isCurrentTurnColor && ludoState.hasRolled && isValidLudoMove(col, idx, ludoState.diceValue);
+
+          tokenEl.className = `ludo-token ${colorBg[col]} ${canMove ? 'can-move pointer-events-auto' : ''}`;
+          tokenEl.style.left = `${x}%`;
+          tokenEl.style.top = `${y}%`;
+          
+          if (canMove) {
+            tokenEl.onclick = (e) => {
+              e.stopPropagation();
+              moveLudoToken(col, idx);
+            };
+          }
+
+          layer.appendChild(tokenEl);
+        });
+      });
+    }
+
+    function isValidLudoMove(player, tokenIdx, dice) {
+      const tok = ludoState.tokens[player][tokenIdx];
+      if (tok.step === -1) return dice === 6;
+      if (tok.step + dice > 56) return false;
+      return true;
+    }
+
+    function handleLudoDiceClick() {
+      if (!ludoState || ludoState.isRolling || ludoState.hasRolled) return;
+      
+      const currentPlayer = ludoState.players[ludoState.turnIndex];
+      const isBot = (currentMode === 'bot' && currentPlayer !== 'red');
+      
+      rollLudoDiceVisual(() => {
+        ludoState.hasRolled = true;
+        
+        // Check if any valid moves exist
+        const movableTokens = [];
+        ludoState.tokens[currentPlayer].forEach((tok, idx) => {
+          if (isValidLudoMove(currentPlayer, idx, ludoState.diceValue)) {
+            movableTokens.push(idx);
+          }
+        });
+
+        renderLudoTokens();
+
+        if (movableTokens.length === 0) {
+          document.getElementById('ludoStatusMsg').innerText = `No moves available for ${currentPlayer.toUpperCase()}!`;
+          setTimeout(nextLudoTurn, 1000);
+        } else if (isBot) {
+          // Automated Bot Pick Best Move
+          setTimeout(() => {
+            const chosenIdx = movableTokens[Math.floor(Math.random() * movableTokens.length)];
+            moveLudoToken(currentPlayer, chosenIdx);
+          }, 600);
+        } else if (movableTokens.length === 1) {
+          // Auto move single option for smooth UX
+          setTimeout(() => {
+            moveLudoToken(currentPlayer, movableTokens[0]);
+          }, 350);
+        }
+      });
+    }
+
+    function rollLudoDiceVisual(callback) {
+      ludoState.isRolling = true;
+      playDiceClatterSfx();
+
+      const cube = document.getElementById('ludoDiceCube');
+      const badge = document.getElementById('ludoDiceValBadge');
+      if (cube) cube.classList.add('rolling-active');
+
+      const rollVal = Math.floor(Math.random() * 6) + 1;
+      ludoState.diceValue = rollVal;
+
+      // Realistic Orientations mapping
+      const faceRotations = {
+        1: 'rotateX(0deg) rotateY(0deg)',
+        6: 'rotateY(180deg)',
+        2: 'rotateY(-90deg)',
+        5: 'rotateY(90deg)',
+        3: 'rotateX(-90deg)',
+        4: 'rotateX(90deg)'
+      };
+
+      setTimeout(() => {
+        if (cube) {
+          cube.classList.remove('rolling-active');
+          cube.style.transform = faceRotations[rollVal];
+        }
+        if (badge) badge.innerText = `Rolled ${rollVal}`;
+        ludoState.isRolling = false;
+        if (callback) callback();
+      }, 850);
+    }
+
+    function moveLudoToken(player, tokenIdx) {
+      if (!ludoState) return;
+      const tok = ludoState.tokens[player][tokenIdx];
+      const dice = ludoState.diceValue;
+
+      if (tok.step === -1 && dice === 6) {
+        tok.step = 0; // Enter board
+      } else {
+        tok.step += dice;
+      }
+
+      // Check for Token Elimination / Mocking Taunt
+      if (tok.step >= 0 && tok.step < 51) {
+        const landingPos = (ludoState.startIndex[player] + tok.step) % 52;
+        // Check if not safe star
+        const safeCells = [0, 8, 13, 21, 26, 34, 39, 47];
+        if (!safeCells.includes(landingPos)) {
+          // Check other players
+          ludoState.players.forEach(otherCol => {
+            if (otherCol !== player) {
+              ludoState.tokens[otherCol].forEach(otherTok => {
+                if (otherTok.step >= 0 && otherTok.step < 51) {
+                  const otherPos = (ludoState.startIndex[otherCol] + otherTok.step) % 52;
+                  if (otherPos === landingPos) {
+                    // Elimination!
+                    otherTok.step = -1;
+                    playCaptureSfx();
+                    document.getElementById('ludoStatusMsg').innerText = `💥 ${player.toUpperCase()} eliminated ${otherCol.toUpperCase()}!`;
+                  }
+                }
+              });
+            }
+          });
+        }
+      }
+
+      // Check for Victory
+      const allHome = ludoState.tokens[player].every(t => t.step >= 56);
+      if (allHome) {
+        triggerVictoryCelebration(`${player.toUpperCase()} WON THE LUDO TOURNAMENT!`);
+        document.getElementById('ludoStatusMsg').innerText = `🏆 ${player.toUpperCase()} IS THE SUPREME CHAMPION!`;
+        renderLudoTokens();
+        return;
+      }
+
+      // Bonus turn on rolling 6
+      if (dice === 6) {
+        ludoState.hasRolled = false;
+        document.getElementById('ludoStatusMsg').innerText = `Rolled a 6! Roll again ${player.toUpperCase()}!`;
+        renderLudoTokens();
+        const nextPlayer = ludoState.players[ludoState.turnIndex];
+        if (currentMode === 'bot' && nextPlayer !== 'red') {
+          setTimeout(handleLudoDiceClick, 800);
+        }
+      } else {
+        nextLudoTurn();
+      }
+    }
+
+    function nextLudoTurn() {
+      if (!ludoState) return;
+      ludoState.hasRolled = false;
+      ludoState.turnIndex = (ludoState.turnIndex + 1) % ludoState.players.length;
+      
+      const nextPlayer = ludoState.players[ludoState.turnIndex];
+      const tag = document.getElementById('ludoCurrentPlayerTag');
+      const badgeColors = {
+        red: 'text-red-400 bg-red-500/20 border-red-500/30',
+        green: 'text-emerald-400 bg-emerald-500/20 border-emerald-500/30',
+        yellow: 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30',
+        blue: 'text-blue-400 bg-blue-500/20 border-blue-500/30'
+      };
+      
+      if (tag) {
+        tag.className = `px-2.5 py-0.5 rounded text-xs font-black uppercase border flex items-center gap-1.5 ${badgeColors[nextPlayer]}`;
+        tag.innerHTML = `<span class="w-2 h-2 rounded-full bg-current inline-block animate-pulse"></span> ${nextPlayer.toUpperCase()} ${nextPlayer === 'red' || currentMode === 'pvp' ? '' : '(Bot)'}`;
+      }
+
+      document.getElementById('ludoStatusMsg').innerText = `${nextPlayer.toUpperCase()}'s turn. Roll the dice!`;
+      renderLudoTokens();
+
+      if (currentMode === 'bot' && nextPlayer !== 'red') {
+        setTimeout(handleLudoDiceClick, 900);
+      }
+    }
+  </script>
+
+  <!-- ================= 2. SNAKES & LADDERS FULL ENGINE ================= -->
+  <script>
+    let snakesState = null;
+
+    function initSnakesGame() {
+      const stage = document.getElementById('gameViewport');
+      stage.innerHTML = `
+        <div class="w-full max-w-2xl flex flex-col items-center gap-4">
+          <div class="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-800 font-tech">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400">Current Turn:</span>
+              <span id="snakesTurnBadge" class="px-2.5 py-0.5 rounded text-xs font-black uppercase text-amber-400 bg-amber-500/20 border border-amber-500/30">
+                Player 1 (Gold)
+              </span>
+            </div>
+            <div id="snakesStatus" class="text-xs text-emerald-400 font-bold">Climb ladders to 100!</div>
+          </div>
+
+          <div class="flex flex-col md:flex-row items-center gap-6 w-full justify-center">
+            <!-- 1-100 Canvas Matrix Grid -->
+            <div class="relative w-[340px] h-[340px] sm:w-[400px] sm:h-[400px] bg-slate-950 rounded-2xl p-2 border-2 border-emerald-500/30 shadow-2xl">
+              <canvas id="snakesCanvas" width="400" height="400" class="w-full h-full rounded-xl"></canvas>
+            </div>
+
+            <!-- Dice Controls -->
+            <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-slate-900/90 border border-emerald-500/20 w-44 space-y-4 font-tech">
+              <span class="text-xs text-slate-400 uppercase">Roll Dice</span>
+              <div id="snakesDiceDisplay" class="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-slate-950 flex items-center justify-center font-black text-3xl shadow-emerald-glow">
+                1
+              </div>
+              <button id="snakesRollBtn" onclick="rollSnakesDice()" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm shadow-emerald-glow transition">
+                ROLL
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Snakes and Ladders Portals Map
+      const portals = {
+        // Ladders
+        4: 14, 9: 31, 20: 38, 28: 84, 40: 59, 51: 67, 63: 81, 71: 91,
+        // Snakes
+        17: 7, 54: 34, 62: 19, 64: 60, 87: 24, 93: 73, 95: 75, 99: 78
+      };
+
+      snakesState = {
+        p1Pos: 1,
+        p2Pos: 1,
+        turn: 'p1', // 'p1' or 'p2'
+        portals: portals,
+        rolling: false
+      };
+
+      drawSnakesBoard();
+    }
+
+    function getGridCoord(cellNum) {
+      const zeroBased = cellNum - 1;
+      const rowFromBottom = Math.floor(zeroBased / 10);
+      const col = (rowFromBottom % 2 === 0) ? (zeroBased % 10) : (9 - (zeroBased % 10));
+      const row = 9 - rowFromBottom;
+      return { x: col * 40 + 20, y: row * 40 + 20 };
+    }
+
+    function drawSnakesBoard() {
+      const canvas = document.getElementById('snakesCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, 400, 400);
+
+      // Draw 100 Grid Cells
+      for (let i = 1; i <= 100; i++) {
+        const coord = getGridCoord(i);
+        const colIdx = Math.floor((i - 1) / 10);
+        ctx.fillStyle = (colIdx % 2 === (i % 2)) ? '#0f172a' : '#1e293b';
+        ctx.fillRect(coord.x - 20, coord.y - 20, 40, 40);
+        ctx.strokeStyle = '#334155';
+        ctx.strokeRect(coord.x - 20, coord.y - 20, 40, 40);
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px Rajdhani, sans-serif';
+        ctx.fillText(i, coord.x - 17, coord.y - 8);
+      }
+
+      // Draw Ladders (Green/Gold Vectors)
+      const ladders = [[4,14], [9,31], [20,38], [28,84], [40,59], [51,67], [63,81], [71,91]];
+      ladders.forEach(([start, end]) => {
+        const p1 = getGridCoord(start);
+        const p2 = getGridCoord(end);
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+      });
+
+      // Draw Snakes (Red/Crimson Curves)
+      const snakes = [[17,7], [54,34], [62,19], [64,60], [87,24], [93,73], [95,75], [99,78]];
+      snakes.forEach(([head, tail]) => {
+        const p1 = getGridCoord(head);
+        const p2 = getGridCoord(tail);
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.quadraticCurveTo((p1.x + p2.x)/2 + 25, (p1.y + p2.y)/2, p2.x, p2.y);
+        ctx.stroke();
+      });
+
+      // Draw P1 Token (Gold)
+      const p1c = getGridCoord(snakesState.p1Pos);
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.arc(p1c.x - 6, p1c.y, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw P2 Token (Cyan/Bot)
+      const p2c = getGridCoord(snakesState.p2Pos);
+      ctx.fillStyle = '#06b6d4';
+      ctx.beginPath();
+      ctx.arc(p2c.x + 6, p2c.y, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function rollSnakesDice() {
+      if (!snakesState || snakesState.rolling) return;
+      snakesState.rolling = true;
+      playDiceClatterSfx();
+
+      const roll = Math.floor(Math.random() * 6) + 1;
+      const display = document.getElementById('snakesDiceDisplay');
+      if (display) display.innerText = roll;
+
+      setTimeout(() => {
+        const isP1 = snakesState.turn === 'p1';
+        let currentPos = isP1 ? snakesState.p1Pos : snakesState.p2Pos;
+
+        if (currentPos + roll <= 100) {
+          currentPos += roll;
+          
+          // Check for Snake or Ladder
+          if (snakesState.portals[currentPos]) {
+            const dest = snakesState.portals[currentPos];
+            if (dest > currentPos) {
+              document.getElementById('snakesStatus').innerText = `🚀 Climbed ladder to ${dest}!`;
+            } else {
+              playCaptureSfx();
+              document.getElementById('snakesStatus').innerText = `🐍 Snake bit down to ${dest}!`;
+            }
+            currentPos = dest;
+          }
+        }
+
+        if (isP1) snakesState.p1Pos = currentPos;
+        else snakesState.p2Pos = currentPos;
+
+        drawSnakesBoard();
+
+        if (currentPos === 100) {
+          const winner = isP1 ? "PLAYER 1" : (currentMode === 'bot' ? "BOT AI" : "PLAYER 2");
+          triggerVictoryCelebration(`${winner} REACHED 100!`);
+          document.getElementById('snakesStatus').innerText = `🏆 ${winner} WON THE RACE!`;
+          snakesState.rolling = false;
+          return;
+        }
+
+        // Switch Turns
+        snakesState.turn = isP1 ? 'p2' : 'p1';
+        snakesState.rolling = false;
+
+        const badge = document.getElementById('snakesTurnBadge');
+        if (snakesState.turn === 'p1') {
+          badge.className = "px-2.5 py-0.5 rounded text-xs font-black uppercase text-amber-400 bg-amber-500/20 border border-amber-500/30";
+          badge.innerText = "Player 1 (Gold)";
+        } else {
+          badge.className = "px-2.5 py-0.5 rounded text-xs font-black uppercase text-cyan-400 bg-cyan-500/20 border border-cyan-500/30";
+          badge.innerText = currentMode === 'bot' ? "Bot AI (Cyan)" : "Player 2 (Cyan)";
+          if (currentMode === 'bot') {
+            setTimeout(rollSnakesDice, 800);
+          }
+        }
+      }, 500);
+    }
+  </script>
+
+  <!-- ================= 3. TIC TAC TOE WITH MINIMAX ================= -->
+  <script>
+    let tttBoard = Array(9).fill(null);
+    let tttTurn = 'X'; // Human is X, Bot/P2 is O
+    let tttActive = true;
+
+    function initTicTacToeGame() {
+      tttBoard = Array(9).fill(null);
+      tttTurn = 'X';
+      tttActive = true;
+
+      const stage = document.getElementById('gameViewport');
+      stage.innerHTML = `
+        <div class="w-full max-w-md flex flex-col items-center gap-5">
+          <div class="w-full flex items-center justify-between px-4 py-2 rounded-xl bg-slate-900/90 border border-purple-500/30 font-tech">
+            <span class="text-xs text-slate-400">Turn: <strong id="tttTurnTag" class="text-purple-400 font-black">X (Player)</strong></span>
+            <span id="tttStatus" class="text-xs text-amber-300 font-bold">Unbeatable Minimax Active</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 w-72 h-72 sm:w-80 sm:h-80 bg-slate-950 p-3 rounded-2xl border-2 border-purple-500/40 shadow-purple-glow">
+            ${[0,1,2,3,4,5,6,7,8].map(i => `
+              <button onclick="handleTttClick(${i})" id="tttCell${i}" class="w-full h-full rounded-xl bg-slate-900 border border-slate-800 hover:border-purple-400/50 flex items-center justify-center text-4xl font-black font-tech text-white transition active:scale-95"></button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function handleTttClick(idx) {
+      if (!tttActive || tttBoard[idx]) return;
+      
+      makeTttMove(idx, tttTurn);
+
+      if (checkTttWin(tttBoard, tttTurn)) {
+        triggerVictoryCelebration(`${tttTurn} WON!`);
+        document.getElementById('tttStatus').innerText = `🏆 ${tttTurn} Emerged Victorious!`;
+        tttActive = false;
+        return;
+      }
+
+      if (tttBoard.every(c => c !== null)) {
+        document.getElementById('tttStatus').innerText = "Draw! Minimax Mastered the Board.";
+        tttActive = false;
+        return;
+      }
+
+      tttTurn = (tttTurn === 'X') ? 'O' : 'X';
+      document.getElementById('tttTurnTag').innerText = `${tttTurn} ${currentMode === 'bot' && tttTurn === 'O' ? '(AI)' : ''}`;
+
+      if (currentMode === 'bot' && tttTurn === 'O' && tttActive) {
+        setTimeout(runMinimaxBotMove, 400);
+      }
+    }
+
+    function makeTttMove(idx, player) {
+      tttBoard[idx] = player;
+      const cell = document.getElementById(`tttCell${idx}`);
+      if (cell) {
+        cell.innerText = player;
+        cell.classList.add(player === 'X' ? 'text-purple-400' : 'text-amber-400');
+      }
+    }
+
+    function checkTttWin(board, p) {
+      const wins = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      return wins.some(([a,b,c]) => board[a] === p && board[b] === p && board[c] === p);
+    }
+
+    // Minimax Unbeatable Bot Algorithm
+    function runMinimaxBotMove() {
+      let bestScore = -Infinity;
+      let bestMove = null;
+
+      for (let i = 0; i < 9; i++) {
+        if (tttBoard[i] === null) {
+          tttBoard[i] = 'O';
+          let score = minimax(tttBoard, 0, false);
+          tttBoard[i] = null;
+          if (score > bestScore) {
+            bestScore = score;
+            bestMove = i;
+          }
+        }
+      }
+
+      if (bestMove !== null) {
+        handleTttClick(bestMove);
+      }
+    }
+
+    function minimax(board, depth, isMaximizing) {
+      if (checkTttWin(board, 'O')) return 10 - depth;
+      if (checkTttWin(board, 'X')) return depth - 10;
+      if (board.every(c => c !== null)) return 0;
+
+      if (isMaximizing) {
+        let best = -Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (board[i] === null) {
+            board[i] = 'O';
+            best = Math.max(best, minimax(board, depth + 1, false));
+            board[i] = null;
+          }
+        }
+        return best;
+      } else {
+        let best = Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (board[i] === null) {
+            board[i] = 'X';
+            best = Math.min(best, minimax(board, depth + 1, true));
+            board[i] = null;
+          }
+        }
+        return best;
+      }
+    }
+  </script>
+
+  <!-- ================= 4. CONNECT FOUR FULL ENGINE ================= -->
+  <script>
+    let c4Grid = [];
+    const C4_ROWS = 6;
+    const C4_COLS = 7;
+    let c4Turn = 1; // 1 = Red, 2 = Yellow
+    let c4Active = true;
+
+    function initConnect4Game() {
+      c4Grid = Array(C4_ROWS).fill(null).map(() => Array(C4_COLS).fill(0));
+      c4Turn = 1;
+      c4Active = true;
+
+      const stage = document.getElementById('gameViewport');
+      stage.innerHTML = `
+        <div class="w-full max-w-lg flex flex-col items-center gap-4">
+          <div class="w-full flex items-center justify-between px-4 py-2 rounded-xl bg-slate-900/90 border border-cyan-500/30 font-tech">
+            <span class="text-xs text-slate-400">Turn: <strong id="c4TurnTag" class="text-rose-400 font-black">Player 1 (Red)</strong></span>
+            <span id="c4Status" class="text-xs text-cyan-300 font-bold">Connect 4 to Win</span>
+          </div>
+
+          <!-- Connect 4 Vertical Frame -->
+          <div class="bg-blue-950/80 p-3 sm:p-4 rounded-2xl border-4 border-cyan-500/50 shadow-neon-glow">
+            <div class="grid grid-cols-7 gap-2">
+              ${[0,1,2,3,4,5,6].map(col => `
+                <button onclick="dropC4Chip(${col})" class="flex flex-col gap-2 p-1 bg-slate-900/60 hover:bg-cyan-500/20 rounded-xl transition">
+                  ${[0,1,2,3,4,5].map(row => `
+                    <div id="c4Cell_${row}_${col}" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-slate-950 border-2 border-slate-800 flex items-center justify-center transition-all duration-300"></div>
+                  `).join('')}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function dropC4Chip(col) {
+      if (!c4Active) return;
+      
+      // Find lowest empty slot
+      let targetRow = -1;
+      for (let r = C4_ROWS - 1; r >= 0; r--) {
+        if (c4Grid[r][col] === 0) {
+          targetRow = r;
+          break;
+        }
+      }
+      if (targetRow === -1) return; // Column full
+
+      c4Grid[targetRow][col] = c4Turn;
+      const cell = document.getElementById(`c4Cell_${targetRow}_${col}`);
+      if (cell) {
+        cell.className = `w-9 h-9 sm:w-11 sm:h-11 rounded-full border-2 border-white flex items-center justify-center ${c4Turn === 1 ? 'bg-rose-500 shadow-crimson-glow' : 'bg-amber-400 shadow-gold-glow'}`;
+      }
+
+      if (checkC4Win(c4Grid, c4Turn)) {
+        const winner = c4Turn === 1 ? "RED" : "YELLOW";
+        triggerVictoryCelebration(`${winner} CONNECTED FOUR!`);
+        document.getElementById('c4Status').innerText = `🏆 ${winner} WON THE MATCH!`;
+        c4Active = false;
+        return;
+      }
+
+      // Toggle Turn
+      c4Turn = (c4Turn === 1) ? 2 : 1;
+      const tag = document.getElementById('c4TurnTag');
+      if (c4Turn === 1) {
+        tag.className = "text-rose-400 font-black";
+        tag.innerText = "Player 1 (Red)";
+      } else {
+        tag.className = "text-amber-400 font-black";
+        tag.innerText = currentMode === 'bot' ? "Bot AI (Yellow)" : "Player 2 (Yellow)";
+        if (currentMode === 'bot' && c4Active) {
+          setTimeout(runC4SmartBot, 500);
+        }
+      }
+    }
+
+    function checkC4Win(grid, p) {
+      // Horizontal
+      for (let r = 0; r < C4_ROWS; r++) {
+        for (let c = 0; c < C4_COLS - 3; c++) {
+          if (grid[r][c] === p && grid[r][c+1] === p && grid[r][c+2] === p && grid[r][c+3] === p) return true;
+        }
+      }
+      // Vertical
+      for (let r = 0; r < C4_ROWS - 3; r++) {
+        for (let c = 0; c < C4_COLS; c++) {
+          if (grid[r][c] === p && grid[r+1][c] === p && grid[r+2][c] === p && grid[r+3][c] === p) return true;
+        }
+      }
+      // Diagonal Down-Right
+      for (let r = 0; r < C4_ROWS - 3; r++) {
+        for (let c = 0; c < C4_COLS - 3; c++) {
+          if (grid[r][c] === p && grid[r+1][c+1] === p && grid[r+2][c+2] === p && grid[r+3][c+3] === p) return true;
+        }
+      }
+      // Diagonal Up-Right
+      for (let r = 3; r < C4_ROWS; r++) {
+        for (let c = 0; c < C4_COLS - 3; c++) {
+          if (grid[r][c] === p && grid[r-1][c+1] === p && grid[r-2][c+2] === p && grid[r-3][c+3] === p) return true;
+        }
+      }
+      return false;
+    }
+
+    // Smart Block-and-Trap AI Algorithm
+    function runC4SmartBot() {
+      // 1. Can Bot win this turn?
+      for (let c = 0; c < C4_COLS; c++) {
+        let r = getLowestRow(c);
+        if (r !== -1) {
+          c4Grid[r][c] = 2;
+          if (checkC4Win(c4Grid, 2)) {
+            c4Grid[r][c] = 0;
+            dropC4Chip(c);
+            return;
+          }
+          c4Grid[r][c] = 0;
+        }
+      }
+      // 2. Can Player win? Block them!
+      for (let c = 0; c < C4_COLS; c++) {
+        let r = getLowestRow(c);
+        if (r !== -1) {
+          c4Grid[r][c] = 1;
+          if (checkC4Win(c4Grid, 1)) {
+            c4Grid[r][c] = 0;
+            dropC4Chip(c);
+            return;
+          }
+          c4Grid[r][c] = 0;
+        }
+      }
+      // 3. Play Center or Random valid
+      const prefCols = [3, 2, 4, 1, 5, 0, 6];
+      for (let c of prefCols) {
+        if (getLowestRow(c) !== -1) {
+          dropC4Chip(c);
+          return;
+        }
+      }
+    }
+
+    function getLowestRow(col) {
+      for (let r = C4_ROWS - 1; r >= 0; r--) {
+        if (c4Grid[r][col] === 0) return r;
+      }
+      return -1;
+    }
+  </script>
+
+  <!-- ================= 5. CHECKERS GAME ENGINE ================= -->
+  <script>
+    let chBoard = [];
+    let chSelected = null;
+    let chTurn = 'red'; // 'red' or 'black'
+
+    function initCheckersGame() {
+      chBoard = Array(8).fill(null).map(() => Array(8).fill(null));
+      chTurn = 'red';
+      chSelected = null;
+
+      // Populate pieces
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 8; c++) {
+          if ((r + c) % 2 === 1) chBoard[r][c] = { color: 'black', king: false };
+        }
+      }
+      for (let r = 5; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          if ((r + c) % 2 === 1) chBoard[r][c] = { color: 'red', king: false };
+        }
+      }
+
+      const stage = document.getElementById('gameViewport');
+      stage.innerHTML = `
+        <div class="w-full max-w-md flex flex-col items-center gap-4">
+          <div class="w-full flex items-center justify-between px-4 py-2 rounded-xl bg-slate-900/90 border border-amber-500/30 font-tech">
+            <span class="text-xs text-slate-400">Turn: <strong id="chTurnTag" class="text-red-400 font-black">Red Contender</strong></span>
+            <span id="chStatus" class="text-xs text-amber-300 font-bold">Select Piece to Move</span>
+          </div>
+
+          <div class="grid grid-cols-8 w-72 h-72 sm:w-80 sm:h-80 bg-slate-950 p-2 rounded-2xl border-2 border-amber-500/40 shadow-gold-glow" id="checkersGrid">
+          </div>
+        </div>
+      `;
+
+      renderCheckersBoard();
+    }
+
+    function renderCheckersBoard() {
+      const grid = document.getElementById('checkersGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const isDark = (r + c) % 2 === 1;
+          const piece = chBoard[r][c];
+          const isSel = chSelected && chSelected.r === r && chSelected.c === c;
+
+          const cell = document.createElement('div');
+          cell.className = `w-full h-full flex items-center justify-center ${isDark ? 'bg-slate-900' : 'bg-slate-800'} ${isSel ? 'ring-2 ring-amber-400' : ''}`;
+          cell.onclick = () => handleCheckersCellClick(r, c);
+
+          if (piece) {
+            const pDiv = document.createElement('div');
+            pDiv.className = `w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 ${piece.color === 'red' ? 'bg-red-500 border-white shadow-crimson-glow' : 'bg-slate-950 border-amber-400 shadow-md'} flex items-center justify-center font-bold text-[10px] text-amber-400`;
+            if (piece.king) pDiv.innerHTML = '<i class="fa-solid fa-crown"></i>';
+            cell.appendChild(pDiv);
+          }
+
+          grid.appendChild(cell);
+        }
+      }
+    }
+
+    function handleCheckersCellClick(r, c) {
+      const piece = chBoard[r][c];
+
+      if (piece && piece.color === chTurn) {
+        chSelected = { r, c };
+        renderCheckersBoard();
+        return;
+      }
+
+      if (chSelected) {
+        const sr = chSelected.r;
+        const sc = chSelected.c;
+        const selPiece = chBoard[sr][sc];
+
+        // Normal Move (1 step diag)
+        const rowDiff = selPiece.color === 'red' || selPiece.king ? r - sr : 0;
+        const validDir = selPiece.king ? true : (selPiece.color === 'red' ? r === sr - 1 : r === sr + 1);
+
+        if (Math.abs(c - sc) === 1 && validDir && !chBoard[r][c]) {
+          chBoard[r][c] = selPiece;
+          chBoard[sr][sc] = null;
+          if ((selPiece.color === 'red' && r === 0) || (selPiece.color === 'black' && r === 7)) selPiece.king = true;
+          endCheckersTurn();
+          return;
+        }
+
+        // Jump Capture Move (2 steps)
+        if (Math.abs(c - sc) === 2 && Math.abs(r - sr) === 2 && !chBoard[r][c]) {
+          const midR = (r + sr) / 2;
+          const midC = (c + sc) / 2;
+          const midPiece = chBoard[midR][midC];
+
+          if (midPiece && midPiece.color !== selPiece.color) {
+            chBoard[midR][midC] = null;
+            chBoard[r][c] = selPiece;
+            chBoard[sr][sc] = null;
+            playCaptureSfx();
+            if ((selPiece.color === 'red' && r === 0) || (selPiece.color === 'black' && r === 7)) selPiece.king = true;
+            endCheckersTurn();
+            return;
+          }
+        }
+      }
+    }
+
+    function endCheckersTurn() {
+      chSelected = null;
+      chTurn = chTurn === 'red' ? 'black' : 'red';
+      const tag = document.getElementById('chTurnTag');
+      if (chTurn === 'red') {
+        tag.className = 'text-red-400 font-black';
+        tag.innerText = 'Red Contender';
+      } else {
+        tag.className = 'text-amber-400 font-black';
+        tag.innerText = currentMode === 'bot' ? 'Bot AI (Black)' : 'Player 2 (Black)';
+      }
+      renderCheckersBoard();
+
+      if (currentMode === 'bot' && chTurn === 'black') {
+        setTimeout(runCheckersBot, 600);
+      }
+    }
+
+    function runCheckersBot() {
+      // Basic AI move
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          if (chBoard[r][c] && chBoard[r][c].color === 'black') {
+            const targets = [[r+1, c-1], [r+1, c+1]];
+            for (let [tr, tc] of targets) {
+              if (tr < 8 && tc >= 0 && tc < 8 && !chBoard[tr][tc]) {
+                chBoard[tr][tc] = chBoard[r][c];
+                chBoard[r][c] = null;
+                endCheckersTurn();
+                return;
+              }
+            }
+          }
+        }
+      }
+      endCheckersTurn();
+    }
+  </script>
+
+  <!-- ================= 6. UNO-STYLE CARDS ENGINE ================= -->
+  <script>
+    let unoPlayerHand = [];
+    let unoBotHand = [];
+    let unoTopCard = null;
+    let unoTurn = 'player';
+
+    function initUnoGame() {
+      const colors = ['red', 'blue', 'green', 'yellow'];
+      function generateCard() {
+        const c = colors[Math.floor(Math.random() * colors.length)];
+        const v = Math.floor(Math.random() * 10);
+        return { color: c, val: v };
+      }
+
+      unoPlayerHand = Array(5).fill(0).map(generateCard);
+      unoBotHand = Array(5).fill(0).map(generateCard);
+      unoTopCard = generateCard();
+      unoTurn = 'player';
+
+      const stage = document.getElementById('gameViewport');
+      stage.innerHTML = `
+        <div class="w-full max-w-lg flex flex-col items-center gap-5">
+          <div class="w-full flex items-center justify-between px-4 py-2 rounded-xl bg-slate-900/90 border border-pink-500/30 font-tech">
+            <span class="text-xs text-slate-400">Turn: <strong id="unoTurnTag" class="text-pink-400 font-black">Your Turn</strong></span>
+            <span id="unoStatus" class="text-xs text-amber-300 font-bold">Match Color or Number</span>
+          </div>
+
+          <!-- Bot Hand Backsides -->
+          <div class="flex items-center gap-2">
+            ${unoBotHand.map(() => `
+              <div class="w-10 h-14 bg-slate-800 rounded border border-slate-600 flex items-center justify-center text-slate-500 text-xs font-bold">UNO</div>
+            `).join('')}
+          </div>
+
+          <!-- Discard Pile Top Card -->
+          <div class="p-4 bg-slate-950 rounded-2xl border-2 border-pink-500/40 flex items-center gap-4">
+            <div id="unoDiscardCard" class="uno-card uno-${unoTopCard.color}">
+              ${unoTopCard.val}
+            </div>
+            <button onclick="drawUnoCard()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-tech font-bold text-slate-200 border border-slate-600">
+              <i class="fa-solid fa-plus mr-1"></i> Draw Card
+            </button>
+          </div>
+
+          <!-- Player Cards Hand -->
+          <div class="flex flex-wrap items-center justify-center gap-2" id="unoPlayerDeck"></div>
+        </div>
+      `;
+
+      renderUnoPlayerHand();
+    }
+
+    function renderUnoPlayerHand() {
+      const deck = document.getElementById('unoPlayerDeck');
+      if (!deck) return;
+      deck.innerHTML = '';
+
+      unoPlayerHand.forEach((card, idx) => {
+        const el = document.createElement('div');
+        el.className = `uno-card uno-${card.color}`;
+        el.innerText = card.val;
+        el.onclick = () => playUnoCard(idx);
+        deck.appendChild(el);
+      });
+
+      const topCardEl = document.getElementById('unoDiscardCard');
+      if (topCardEl) {
+        topCardEl.className = `uno-card uno-${unoTopCard.color}`;
+        topCardEl.innerText = unoTopCard.val;
+      }
+    }
+
+    function playUnoCard(idx) {
+      if (unoTurn !== 'player') return;
+      const card = unoPlayerHand[idx];
+      if (card.color === unoTopCard.color || card.val === unoTopCard.val) {
+        unoTopCard = card;
+        unoPlayerHand.splice(idx, 1);
+        renderUnoPlayerHand();
+
+        if (unoPlayerHand.length === 0) {
+          triggerVictoryCelebration("YOU WON THE UNO MATCH!");
+          document.getElementById('unoStatus').innerText = "🏆 UNO CHAMPION!";
+          return;
+        }
+
+        unoTurn = 'bot';
+        document.getElementById('unoTurnTag').innerText = "Bot AI Thinking...";
+        setTimeout(runUnoBotTurn, 800);
+      }
+    }
+
+    function drawUnoCard() {
+      if (unoTurn !== 'player') return;
+      const colors = ['red', 'blue', 'green', 'yellow'];
+      unoPlayerHand.push({
+        color: colors[Math.floor(Math.random() * colors.length)],
+        val: Math.floor(Math.random() * 10)
+      });
+      renderUnoPlayerHand();
+      unoTurn = 'bot';
+      document.getElementById('unoTurnTag').innerText = "Bot AI Thinking...";
+      setTimeout(runUnoBotTurn, 800);
+    }
+
+    function runUnoBotTurn() {
+      const matchIdx = unoBotHand.findIndex(c => c.color === unoTopCard.color || c.val === unoTopCard.val);
+      if (matchIdx !== -1) {
+        unoTopCard = unoBotHand[matchIdx];
+        unoBotHand.splice(matchIdx, 1);
+      } else {
+        const colors = ['red', 'blue', 'green', 'yellow'];
+        unoBotHand.push({
+          color: colors[Math.floor(Math.random() * colors.length)],
+          val: Math.floor(Math.random() * 10)
+        });
+      }
+
+      if (unoBotHand.length === 0) {
+        playCaptureSfx();
+        document.getElementById('unoStatus').innerText = "💀 Bot Won the Uno Match!";
+        return;
+      }
+
+      unoTurn = 'player';
+      document.getElementById('unoTurnTag').innerText = "Your Turn";
+      renderUnoPlayerHand();
+    }
+  </script>
+
+  <!-- ================= 7. CLASSIC DOMINOES ENGINE ================= -->
+  <script>
+    let dominoChain = [];
+    let dominoPlayerHand = [];
+
+    function initDominoesGame() {
+      dominoChain = [{ left: 6, right: 6 }];
+      dominoPlayerHand = [
+        { left: 6, right: 5 },
+        { left: 5, right: 3 },
+        { left: 3, right: 2 },
+        { left: 2, right: 6 },
+        { left: 4, right: 1 }
+      ];
+
+      const stage = document.getElementById('gameViewport');
+      stage.innerHTML = `
+        <div class="w-full max-w-lg flex flex-col items-center gap-5">
+          <div class="w-full flex items-center justify-between px-4 py-2 rounded-xl bg-slate-900/90 border border-teal-500/30 font-tech">
+            <span class="text-xs text-slate-400">Mode: <strong class="text-teal-400 font-black">Chain Match</strong></span>
+            <span id="dominoStatus" class="text-xs text-amber-300 font-bold">Match open ends</span>
+          </div>
+
+          <!-- Domino Board Chain -->
+          <div class="w-full p-4 bg-slate-950 rounded-2xl border-2 border-teal-500/40 min-h-[140px] flex items-center justify-center gap-2 overflow-x-auto" id="dominoBoard">
+          </div>
+
+          <!-- Player Tiles Hand -->
+          <div class="text-xs text-slate-400 font-tech uppercase">Your Bones Hand (Click to match):</div>
+          <div class="flex flex-wrap items-center justify-center gap-3" id="dominoHand"></div>
+        </div>
+      `;
+
+      renderDominoes();
+    }
+
+    function renderDominoes() {
+      const bEl = document.getElementById('dominoBoard');
+      const hEl = document.getElementById('dominoHand');
+      if (!bEl || !hEl) return;
+
+      bEl.innerHTML = dominoChain.map(t => `
+        <div class="domino-tile">
+          <div class="domino-half">${t.left}</div>
+          <div class="domino-divider"></div>
+          <div class="domino-half">${t.right}</div>
+        </div>
+      `).join('');
+
+      hEl.innerHTML = '';
+      dominoPlayerHand.forEach((t, idx) => {
+        const el = document.createElement('div');
+        el.className = 'domino-tile';
+        el.innerHTML = `
+          <div class="domino-half">${t.left}</div>
+          <div class="domino-divider"></div>
+          <div class="domino-half">${t.right}</div>
+        `;
+        el.onclick = () => playDominoTile(idx);
+        hEl.appendChild(el);
+      });
+    }
+
+    function playDominoTile(idx) {
+      const tile = dominoPlayerHand[idx];
+      const openLeft = dominoChain[0].left;
+      const openRight = dominoChain[dominoChain.length - 1].right;
+
+      if (tile.right === openLeft) {
+        dominoChain.unshift(tile);
+        dominoPlayerHand.splice(idx, 1);
+      } else if (tile.left === openLeft) {
+        dominoChain.unshift({ left: tile.right, right: tile.left });
+        dominoPlayerHand.splice(idx, 1);
+      } else if (tile.left === openRight) {
+        dominoChain.push(tile);
+        dominoPlayerHand.splice(idx, 1);
+      } else if (tile.right === openRight) {
+        dominoChain.push({ left: tile.right, right: tile.left });
+        dominoPlayerHand.splice(idx, 1);
+      } else {
+        document.getElementById('dominoStatus').innerText = "Tile doesn't match open chain ends!";
+        return;
+      }
+
+      renderDominoes();
+
+      if (dominoPlayerHand.length === 0) {
+        triggerVictoryCelebration("DOMINOES CLEARED!");
+        document.getElementById('dominoStatus').innerText = "🏆 DOMINOES CHAMPION!";
+      }
+    }
+  </script>
+
+  <!-- Default Load Initialization -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      switchTab('home');
+    });
+  </script>
+
+</body>
+</html>
